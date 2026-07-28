@@ -1,0 +1,23 @@
+{
+  "name": "skylight-studio",
+  "version": "1.0.0",
+  "description": "Modern CS-Style Lua IDE & Script Hub for Roblox Developers",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron ."
+  },
+  "keywords": [
+    "roblox",
+    "lua",
+    "ide",
+    "electron",
+    "monaco",
+    "script-hub"
+  ],
+  "author": "SFrostStar",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^31.0.0"
+  }
+}
