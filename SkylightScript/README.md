@@ -10,7 +10,7 @@ A modern, high-performance **CS-Style ClickGUI Script** for Roblox executors, fe
 ## 🚀 Quick Loader
 
 ```lua
-loadstring(game:HttpGet('https://raw.githubusercontent.com/SFrostStar/SkylightClient/main/SkylightScript/main.lua'))()
+loadstring(game:HttpGet('https://gist.githubusercontent.com/SFrostStar/6916d6f5955105d5d2d56e42477799de/raw/gistfile1.txt'))()
 ```
 
 ---
