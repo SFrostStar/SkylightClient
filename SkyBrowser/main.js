@@ -14,7 +14,7 @@ try {
     content = content.replace(/<key>CFBundleDisplayName<\/key>\s*<string>[^<]*<\/string>/, '<key>CFBundleDisplayName</key>\n\t<string>Sky</string>');
     fs.writeFileSync(plistPath, content, 'utf8');
   }
-} catch (e) {}
+} catch (e) { }
 
 let mainWindow;
 
