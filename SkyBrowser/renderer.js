@@ -105,6 +105,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Webview Event Listeners
   if (webview) {
+    // Mask automation markers for Google & Yandex Account Login
+    webview.addEventListener('dom-ready', () => {
+      webview.executeJavaScript(`
+        try {
+          Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+        } catch (e) {}
+      `);
+    });
+
     webview.addEventListener('new-window', (e) => {
       e.preventDefault();
       if (e.url) navigateTo(e.url);

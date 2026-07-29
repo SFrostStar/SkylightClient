@@ -1,20 +1,13 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, session } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
+// Ignore SSL Certificate Handshake Errors for smooth web navigation
+app.commandLine.appendSwitch('ignore-certificate-errors');
+app.commandLine.appendSwitch('allow-insecure-localhost', 'true');
+
 app.name = 'Sky';
 if (app.setName) app.setName('Sky');
-
-// Dynamically patch Info.plist for macOS Dock process name
-try {
-  const plistPath = path.join(__dirname, 'node_modules/electron/dist/Electron.app/Contents/Info.plist');
-  if (fs.existsSync(plistPath)) {
-    let content = fs.readFileSync(plistPath, 'utf8');
-    content = content.replace(/<key>CFBundleName<\/key>\s*<string>[^<]*<\/string>/, '<key>CFBundleName</key>\n\t<string>Sky</string>');
-    content = content.replace(/<key>CFBundleDisplayName<\/key>\s*<string>[^<]*<\/string>/, '<key>CFBundleDisplayName</key>\n\t<string>Sky</string>');
-    fs.writeFileSync(plistPath, content, 'utf8');
-  }
-} catch (e) { }
 
 let mainWindow;
 
@@ -22,8 +15,8 @@ function createWindow() {
   const iconPath = path.join(__dirname, 'icon.png');
 
   mainWindow = new BrowserWindow({
-    width: 1100,
-    height: 720,
+    width: 1040,
+    height: 680,
     minWidth: 800,
     minHeight: 500,
     frame: false,
@@ -34,7 +27,8 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
-      webviewTag: true, // Enables <webview> tag for fast sandboxed browsing
+      webviewTag: true,
+      allowRunningInsecureContent: true,
       sandbox: false
     }
   });
@@ -51,6 +45,15 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  // Override User-Agent headers globally to match genuine standalone Google Chrome on macOS
+  const realChromeUA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
+
+  session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+    details.requestHeaders['User-Agent'] = realChromeUA;
+    delete details.requestHeaders['X-Electron'];
+    callback({ cancel: false, requestHeaders: details.requestHeaders });
+  });
+
   createWindow();
 
   app.on('activate', () => {
