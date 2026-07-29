@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Skylight Studio v1.0 - Luxury Edition</title>
+  <title>Skylight Studio Pro</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,23 +12,36 @@
 </head>
 <body>
   <div class="app-container">
-    <!-- Custom Glass Header -->
+    <!-- Custom Glass Header with Centered Title -->
     <header class="titlebar">
-      <div class="titlebar-drag-region">
-        <div class="titlebar-logo">
-          <span class="logo-icon">⚡</span>
-          <span class="gradient-text">Skylight <span class="accent-gold">Studio</span></span>
-          <span class="version-badge">v1.0 Pro</span>
-        </div>
+      <div class="titlebar-left">
         <div class="titlebar-watermark">
           <span class="status-dot online"></span>
-          <span>By SFrostStar | Luau Engine</span>
+          <span>Luau Environment</span>
         </div>
       </div>
-      <div class="window-controls">
-        <button id="btn-minimize" class="control-btn" title="Minimize">⎯</button>
-        <button id="btn-maximize" class="control-btn" title="Maximize">🗖</button>
-        <button id="btn-close" class="control-btn close-btn" title="Close">✕</button>
+
+      <!-- Centered App Logo & Title -->
+      <div class="titlebar-center">
+        <div class="titlebar-logo">
+          <svg class="logo-icon-svg" viewBox="0 0 24 24" width="20" height="20">
+            <path fill="currentColor" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+          <span class="gradient-title">Skylight <span class="accent-violet">Studio</span></span>
+          <span class="version-badge">v2.0</span>
+        </div>
+      </div>
+
+      <div class="titlebar-right window-controls">
+        <button id="btn-minimize" class="control-btn" title="Minimize">
+          <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M19 13H5v-2h14v2z"/></svg>
+        </button>
+        <button id="btn-maximize" class="control-btn" title="Maximize">
+          <svg viewBox="0 0 24 24" width="12" height="12"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
+        </button>
+        <button id="btn-close" class="control-btn close-btn" title="Close">
+          <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
       </div>
     </header>
 
@@ -45,13 +58,17 @@
             <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
             <span>Script Hub</span>
           </button>
+          <button id="nav-settings" class="nav-item" title="Settings & Credits">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            <span>Settings</span>
+          </button>
           <button id="nav-console-toggle" class="nav-item" title="Console Logs">
             <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/></svg>
             <span>Console</span>
           </button>
         </div>
         <div class="nav-bottom">
-          <button id="btn-execute-sim" class="execute-btn" title="Validate & Run Script">
+          <button id="btn-execute-sim" class="execute-btn" title="Validate & Execute Script">
             <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
             <span>RUN</span>
           </button>
@@ -67,9 +84,18 @@
               <!-- Tabs rendered dynamically -->
             </div>
             <div class="editor-actions">
-              <button id="btn-new-tab" class="action-btn" title="New Tab">+ New</button>
-              <button id="btn-open-file" class="action-btn" title="Open File">📂 Open</button>
-              <button id="btn-save-file" class="action-btn accent-btn" title="Save File (Ctrl+S)">💾 Save</button>
+              <button id="btn-new-tab" class="action-btn" title="New Tab">
+                <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                <span>New</span>
+              </button>
+              <button id="btn-open-file" class="action-btn" title="Open File">
+                <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+                <span>Open</span>
+              </button>
+              <button id="btn-save-file" class="action-btn accent-btn" title="Save File">
+                <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+                <span>Save</span>
+              </button>
             </div>
           </div>
           <div id="monaco-container" class="editor-container"></div>
@@ -78,7 +104,7 @@
         <!-- Script Hub View -->
         <section id="view-scripthub" class="view-panel hidden">
           <div class="scripthub-header">
-            <h2>⚡ Skylight Community Script Hub</h2>
+            <h2>Skylight Community Script Hub</h2>
             <p>Select high-performance Lua scripts, frameworks & utilities to load into your editor.</p>
             <div class="search-bar">
               <input type="text" id="script-search" placeholder="Search by script name, tag, or author...">
@@ -88,10 +114,77 @@
             <!-- Cards rendered via renderer.js -->
           </div>
         </section>
+
+        <!-- Settings & Credits View -->
+        <section id="view-settings" class="view-panel hidden">
+          <div class="settings-container">
+            <div class="settings-header">
+              <h2>Studio Settings & Developer Credits</h2>
+              <p>System information, credits, and environment preferences.</p>
+            </div>
+
+            <div class="settings-grid">
+              <!-- Developer Credits Card -->
+              <div class="settings-card highlight-card">
+                <div class="card-header-icon">
+                  <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                  <h3>Developer Credits</h3>
+                </div>
+                <div class="credits-list">
+                  <div class="credit-item">
+                    <span class="credit-label">Lead Developer:</span>
+                    <span class="credit-value badge-primary">SFrostStar (A1wertykss)</span>
+                  </div>
+                  <div class="credit-item">
+                    <span class="credit-label">Discord Contact:</span>
+                    <div class="discord-chip">
+                      <span>xsynapse</span>
+                      <button id="btn-copy-discord" class="chip-copy-btn">Copy</button>
+                    </div>
+                  </div>
+                  <div class="credit-item">
+                    <span class="credit-label">Client Script:</span>
+                    <span class="credit-value">Skylight Client v2.0</span>
+                  </div>
+                  <div class="credit-item">
+                    <span class="credit-label">Studio Version:</span>
+                    <span class="credit-value badge-gold">v2.0 Pro Edition</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Environment Info Card -->
+              <div class="settings-card">
+                <div class="card-header-icon">
+                  <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+                  <h3>Environment Info</h3>
+                </div>
+                <div class="credits-list">
+                  <div class="credit-item">
+                    <span class="credit-label">Lua Engine:</span>
+                    <span class="credit-value">Luau / Lua 5.1 AST</span>
+                  </div>
+                  <div class="credit-item">
+                    <span class="credit-label">Editor Core:</span>
+                    <span class="credit-value">Monaco Editor (VS Code)</span>
+                  </div>
+                  <div class="credit-item">
+                    <span class="credit-label">Platform Engine:</span>
+                    <span class="credit-value">Electron + Node.js</span>
+                  </div>
+                  <div class="credit-item">
+                    <span class="credit-label">Target Platform:</span>
+                    <span class="credit-value">Roblox Executor API</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
 
-    <!-- Functional Output Console -->
+    <!-- Output Console Drawer -->
     <footer id="console-drawer" class="console-drawer">
       <div class="console-header" id="console-header">
         <div class="console-title">
@@ -99,13 +192,16 @@
           <span>Output & Real-Time Log Terminal</span>
         </div>
         <div class="console-actions">
-          <button id="btn-clear-console" class="icon-btn" title="Clear Logs">🗑️ Clear</button>
-          <button id="btn-toggle-drawer" class="icon-btn" title="Toggle Size">▼ Toggle</button>
+          <button id="btn-clear-console" class="icon-btn" title="Clear Logs">
+            <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            <span>Clear</span>
+          </button>
+          <button id="btn-toggle-drawer" class="icon-btn" title="Toggle Console">
+            <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+          </button>
         </div>
       </div>
-      <div class="console-body" id="console-logs">
-        <!-- Log entries -->
-      </div>
+      <div class="console-body" id="console-logs"></div>
     </footer>
 
     <!-- Status Bar -->
@@ -115,7 +211,7 @@
         <span id="status-text">Status: Ready</span>
       </div>
       <div class="status-item right">
-        <span id="syntax-status">Syntax: Valid</span>
+        <span id="syntax-status">Syntax: Clean</span>
         <span>Environment: Luau / Lua 5.1</span>
         <span>UTF-8</span>
       </div>

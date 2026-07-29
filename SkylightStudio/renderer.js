@@ -8,33 +8,50 @@ document.addEventListener('DOMContentLoaded', () => {
   // Navigation
   const navEditor = document.getElementById('nav-editor');
   const navScriptHub = document.getElementById('nav-scripthub');
+  const navSettings = document.getElementById('nav-settings');
   const navConsoleToggle = document.getElementById('nav-console-toggle');
+
   const viewEditor = document.getElementById('view-editor');
   const viewScriptHub = document.getElementById('view-scripthub');
+  const viewSettings = document.getElementById('view-settings');
+
   const consoleDrawer = document.getElementById('console-drawer');
   const consoleHeader = document.getElementById('console-header');
   const btnToggleDrawer = document.getElementById('btn-toggle-drawer');
-  const statusText = document.getElementById('status-text');
   const syntaxStatus = document.getElementById('syntax-status');
 
   function switchView(view) {
+    navEditor?.classList.remove('active');
+    navScriptHub?.classList.remove('active');
+    navSettings?.classList.remove('active');
+
+    viewEditor?.classList.add('hidden');
+    viewScriptHub?.classList.add('hidden');
+    viewSettings?.classList.add('hidden');
+
     if (view === 'editor') {
       navEditor?.classList.add('active');
-      navScriptHub?.classList.remove('active');
       viewEditor?.classList.remove('hidden');
-      viewScriptHub?.classList.add('hidden');
     } else if (view === 'scripthub') {
       navScriptHub?.classList.add('active');
-      navEditor?.classList.remove('active');
       viewScriptHub?.classList.remove('hidden');
-      viewEditor?.classList.add('hidden');
+    } else if (view === 'settings') {
+      navSettings?.classList.add('active');
+      viewSettings?.classList.remove('hidden');
     }
   }
 
   navEditor?.addEventListener('click', () => switchView('editor'));
   navScriptHub?.addEventListener('click', () => switchView('scripthub'));
+  navSettings?.addEventListener('click', () => switchView('settings'));
 
-  // Console Collapse/Expand Logic
+  // Copy Discord Tag
+  document.getElementById('btn-copy-discord')?.addEventListener('click', () => {
+    navigator.clipboard.writeText('xsynapse');
+    logConsole('Copied Discord contact "xsynapse" to clipboard!', 'system');
+  });
+
+  // Console Drawer Toggle
   function toggleConsole() {
     consoleDrawer?.classList.toggle('collapsed');
   }
@@ -55,14 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const entry = document.createElement('div');
     entry.className = `log-entry ${type}`;
     const timestamp = new Date().toLocaleTimeString();
-    
-    let prefix = 'ℹ️';
-    if (type === 'error') prefix = '❌';
-    else if (type === 'warn') prefix = '⚠️';
-    else if (type === 'success') prefix = '✅';
-    else if (type === 'system') prefix = '⚙️';
 
-    entry.innerHTML = `<span class="log-timestamp">${timestamp}</span> <span>${prefix} ${message}</span>`;
+    entry.innerHTML = `<span class="log-timestamp">${timestamp}</span> <span>${message}</span>`;
     consoleLogs.appendChild(entry);
     consoleLogs.scrollTop = consoleLogs.scrollHeight;
   }
@@ -82,33 +93,33 @@ document.addEventListener('DOMContentLoaded', () => {
   require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } });
 
   require(['vs/editor/editor.main'], () => {
-    // Custom Luxury Cyber-Emerald Monaco Theme
-    monaco.editor.defineTheme('skylight-emerald-gold', {
+    // Custom Luxury Deep Obsidian & Sapphire Theme
+    monaco.editor.defineTheme('skylight-sapphire-violet', {
       base: 'vs-dark',
       inherit: true,
       rules: [
-        { token: 'keyword', foreground: '34d399', fontStyle: 'bold' },
-        { token: 'string', foreground: 'fbbf24' },
-        { token: 'number', foreground: '38bdf8' },
+        { token: 'keyword', foreground: '38bdf8', fontStyle: 'bold' },
+        { token: 'string', foreground: 'a855f7' },
+        { token: 'number', foreground: 'fbbf24' },
         { token: 'comment', foreground: '64748b', fontStyle: 'italic' },
         { token: 'identifier', foreground: 'f8fafc' },
-        { token: 'delimiter', foreground: 'a78bfa' }
+        { token: 'delimiter', foreground: '6366f1' }
       ],
       colors: {
-        'editor.background': '#07080e',
+        'editor.background': '#08090e',
         'editor.foreground': '#f8fafc',
-        'editor.lineHighlightBackground': '#171928',
-        'editorCursor.foreground': '#34d399',
-        'editorWhitespace.foreground': '#22253b',
-        'editorIndentGuide.background': '#171928',
-        'editorIndentGuide.activeBackground': '#10b981'
+        'editor.lineHighlightBackground': '#171926',
+        'editorCursor.foreground': '#38bdf8',
+        'editorWhitespace.foreground': '#212438',
+        'editorIndentGuide.background': '#171926',
+        'editorIndentGuide.activeBackground': '#38bdf8'
       }
     });
 
     monacoEditor = monaco.editor.create(document.getElementById('monaco-container'), {
-      value: '-- Skylight Studio v1.0 Luxury Edition\n-- Real-Time Luau Syntax Validation Active\n\nlocal Services = {\n    Players = game:GetService("Players")\n}\n\nprint("Skylight Studio initialized cleanly!")\n',
+      value: '-- Skylight Studio v2.0 Pro\n-- Real-Time Luau Syntax Validation Active\n\nlocal Services = {\n    Players = game:GetService("Players")\n}\n\nprint("Skylight Studio initialized cleanly!")\n',
       language: 'lua',
-      theme: 'skylight-emerald-gold',
+      theme: 'skylight-sapphire-violet',
       automaticLayout: true,
       fontFamily: 'JetBrains Mono',
       fontSize: 13.5,
@@ -118,11 +129,10 @@ document.addEventListener('DOMContentLoaded', () => {
       tabSize: 4
     });
 
-    // Real-Time Lua Syntax Error Checking
+    // Real-Time Syntax Validation
     monacoEditor.onDidChangeModelContent(() => {
       const code = monacoEditor.getValue();
-      
-      // Update Tab state
+
       if (activeTabId) {
         const tab = tabs.find(t => t.id === activeTabId);
         if (tab) {
@@ -132,13 +142,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // Validate Code with luaparse via Electron IPC
       if (window.electronAPI && window.electronAPI.validateLua) {
         const result = window.electronAPI.validateLua(code);
         const model = monacoEditor.getModel();
 
         if (!result.valid) {
-          // Set red error markers in Monaco Editor
           monaco.editor.setModelMarkers(model, 'luaparse', [{
             startLineNumber: result.line,
             startColumn: result.column + 1,
@@ -152,16 +160,14 @@ document.addEventListener('DOMContentLoaded', () => {
             syntaxStatus.innerHTML = `<span class="error-badge-status">Error Line ${result.line}:${result.column}</span>`;
           }
         } else {
-          // Clear Markers if syntax is clean
           monaco.editor.setModelMarkers(model, 'luaparse', []);
           if (syntaxStatus) {
-            syntaxStatus.innerHTML = `<span style="color: var(--accent-emerald-light);">Syntax: Clean</span>`;
+            syntaxStatus.innerHTML = `<span style="color: var(--accent-blue);">Syntax: Clean</span>`;
           }
         }
       }
     });
 
-    // Create Initial Tab
     createTab('SkylightClient.lua', getInitialScript());
     logConsole('Skylight Studio Pro Edition online. Monaco Editor initialized.', 'success');
   });
@@ -170,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return `--[[
     ⚡ Skylight Client v2.0
     CS-Style ClickGUI Script for Roblox
-    Author: SFrostStar
+    Developer: SFrostStar | Discord: xsynapse
 --]]
 
 local Services = {
@@ -240,7 +246,7 @@ InitializeClient()
     });
   }
 
-  // New, Open, Save Handlers
+  // New, Open, Save
   document.getElementById('btn-new-tab')?.addEventListener('click', () => createTab());
 
   document.getElementById('btn-open-file')?.addEventListener('click', async () => {
@@ -249,7 +255,7 @@ InitializeClient()
       const id = 'tab-' + Date.now();
       tabs.push({ id, filename: fileResult.filename, content: fileResult.content, filePath: fileResult.filePath, isDirty: false });
       setActiveTab(id);
-      logConsole(`Opened file from disk: ${fileResult.filename}`, 'success');
+      logConsole(`Opened file: ${fileResult.filename}`, 'success');
     }
   });
 
@@ -267,11 +273,11 @@ InitializeClient()
       activeTab.filename = saveResult.filename;
       activeTab.isDirty = false;
       renderTabs();
-      logConsole(`Saved file to disk: ${saveResult.filename}`, 'success');
+      logConsole(`Saved file: ${saveResult.filename}`, 'success');
     }
   });
 
-  // Execute & Validate Script Button
+  // Execute Script
   document.getElementById('btn-execute-sim')?.addEventListener('click', () => {
     const code = monacoEditor ? monacoEditor.getValue() : '';
     logConsole('Validating & Executing script in Luau Simulator...', 'system');
@@ -288,7 +294,7 @@ InitializeClient()
     }
 
     const lineCount = code.split('\n').length;
-    logConsole(`[Execution Output] Clean run! Successfully validated and executed ${lineCount} lines of Luau code.`, 'success');
+    logConsole(`[Execution Success] Validated and executed ${lineCount} lines of Luau code cleanly.`, 'success');
   });
 
   // Script Hub Catalog
@@ -315,7 +321,7 @@ InitializeClient()
       author: 'Skylight Team',
       desc: 'High-performance player highlight ESP using Roblox Highlight service with custom outline colors.',
       tags: ['Visuals', 'ESP'],
-      loadstring: 'local Players = game:GetService("Players")\nfor _, p in pairs(Players:GetPlayers()) do\n    if p.Character then\n        local h = Instance.new("Highlight", p.Character)\n        h.FillColor = Color3.fromRGB(16, 185, 129)\n    end\nend'
+      loadstring: 'local Players = game:GetService("Players")\nfor _, p in pairs(Players:GetPlayers()) do\n    if p.Character then\n        local h = Instance.new("Highlight", p.Character)\n        h.FillColor = Color3.fromRGB(56, 189, 248)\n    end\nend'
     },
     {
       id: 4,
@@ -338,7 +344,7 @@ InitializeClient()
       card.innerHTML = `
         <div>
           <div class="card-title">${script.title}</div>
-          <div style="font-size: 11px; color: var(--accent-gold); margin: 3px 0 8px 0;">by ${script.author}</div>
+          <div style="font-size: 11px; color: var(--accent-blue); margin: 3px 0 8px 0;">by ${script.author}</div>
           <div class="card-desc">${script.desc}</div>
         </div>
         <div>
