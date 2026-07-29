@@ -2,7 +2,14 @@ const { app, BrowserWindow, ipcMain, session } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
-// Ignore SSL Certificate Handshake Errors for smooth web navigation
+// Real Chrome & Firefox User-Agents to bypass embedded webview blocks
+const CHROME_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
+const FIREFOX_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:127.0) Gecko/20100101 Firefox/127.0';
+
+// Global userAgent fallback
+app.userAgentFallback = CHROME_UA;
+
+// Switches for smooth navigation
 app.commandLine.appendSwitch('ignore-certificate-errors');
 app.commandLine.appendSwitch('allow-insecure-localhost', 'true');
 
@@ -45,11 +52,19 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  // Override User-Agent headers globally to match genuine standalone Google Chrome on macOS
-  const realChromeUA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
+  // Set default session User-Agent
+  session.defaultSession.setUserAgent(CHROME_UA);
 
+  // Dynamic Header Interceptor: Send Firefox UA to Google Accounts (bypasses Electron webview block), Chrome UA to rest
   session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
-    details.requestHeaders['User-Agent'] = realChromeUA;
+    const url = details.url.toLowerCase();
+    
+    if (url.includes('accounts.google.com') || url.includes('myaccount.google.com') || url.includes('oauth2')) {
+      details.requestHeaders['User-Agent'] = FIREFOX_UA;
+    } else {
+      details.requestHeaders['User-Agent'] = CHROME_UA;
+    }
+    
     delete details.requestHeaders['X-Electron'];
     callback({ cancel: false, requestHeaders: details.requestHeaders });
   });
