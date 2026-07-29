@@ -211,13 +211,14 @@ body {
   border-color: var(--border-active);
 }
 
-/* Progress Bar */
+/* Progress Bar Smooth Auto-Hiding */
 .progress-bar {
   height: 2px;
   background: var(--accent-sky);
   width: 0%;
-  transition: width 0.2s ease, opacity 0.2s ease;
   opacity: 0;
+  pointer-events: none;
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
 }
 
 .progress-bar.loading {
