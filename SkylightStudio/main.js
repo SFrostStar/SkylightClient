@@ -6,13 +6,14 @@ let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    minWidth: 900,
-    minHeight: 600,
-    frame: false, // Frameless custom CS-style UI
+    width: 1240,
+    height: 820,
+    minWidth: 920,
+    minHeight: 620,
+    frame: false,
     titleBarStyle: 'hidden',
-    backgroundColor: '#0b0b12',
+    backgroundColor: '#08090e',
+    icon: path.join(__dirname, 'icon.svg'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,

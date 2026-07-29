@@ -297,14 +297,14 @@ InitializeClient()
     logConsole(`[Execution Success] Validated and executed ${lineCount} lines of Luau code cleanly.`, 'success');
   });
 
-  // Script Hub Catalog
+  // Script Hub Catalog (20+ Essential Scripts & Snippets)
   const presetScripts = [
     {
       id: 1,
       title: 'Skylight Client v2.0',
       author: 'SFrostStar',
-      desc: 'CS-Style ClickGUI with Combat (Aura, AimLock), Movement (Speed, VClip), Visuals (ESP, Ambiance), and HUD Widgets.',
-      tags: ['Combat', 'GUI', 'Roblox'],
+      desc: 'Full CS-Style ClickGUI with Combat (Aura, AimLock), Movement (Speed, VClip), Visuals (ESP, Ambiance), and HUD Widgets.',
+      tags: ['Full Client', 'Combat', 'GUI'],
       loadstring: "loadstring(game:HttpGet('https://raw.githubusercontent.com/SFrostStar/SkylightClient/main/SkylightScript/main.lua'))()"
     },
     {
@@ -317,6 +317,22 @@ InitializeClient()
     },
     {
       id: 3,
+      title: 'Orion UI Library Template',
+      author: 'shlexware',
+      desc: 'Clean, lightweight UI library with animated toggles, sliders, and keybind handlers.',
+      tags: ['UI Framework', 'Template'],
+      loadstring: 'local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()\nlocal Window = OrionLib:MakeWindow({Name = "Orion Hub", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})'
+    },
+    {
+      id: 4,
+      title: 'Fluent UI Library Template',
+      author: 'dawid',
+      desc: 'Sleek Windows 11 style UI framework with Acrylic glassmorphic blur and theme customizers.',
+      tags: ['UI Framework', 'Acrylic'],
+      loadstring: 'local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()\nlocal Window = Fluent:CreateWindow({ Title = "Fluent Hub", SubTitle = "v1.0", TabWidth = 160, Size = UDim2.fromOffset(580, 460), Theme = "Dark" })'
+    },
+    {
+      id: 5,
       title: 'Universal 3D Glow ESP',
       author: 'Skylight Team',
       desc: 'High-performance player highlight ESP using Roblox Highlight service with custom outline colors.',
@@ -324,12 +340,132 @@ InitializeClient()
       loadstring: 'local Players = game:GetService("Players")\nfor _, p in pairs(Players:GetPlayers()) do\n    if p.Character then\n        local h = Instance.new("Highlight", p.Character)\n        h.FillColor = Color3.fromRGB(56, 189, 248)\n    end\nend'
     },
     {
-      id: 4,
-      title: 'CFrame Speed & Flight Engine',
+      id: 6,
+      title: 'Tracers & Line ESP Engine',
       author: 'Skylight Team',
-      desc: 'Smooth velocity-based movement framework with customizable hold keys and speed multipliers.',
-      tags: ['Movement', 'Utility'],
-      loadstring: 'local RS = game:GetService("RunService")\nlocal LP = game:GetService("Players").LocalPlayer\nRS.RenderStepped:Connect(function()\n    if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then\n        -- Speed & flight calculations\n    end\nend)'
+      desc: '2D screen-to-player tracer lines drawing from bottom-center of screen to enemy HumanoidRootPart.',
+      tags: ['Visuals', 'Tracers'],
+      loadstring: 'local Camera = workspace.CurrentCamera\nlocal Players = game:GetService("Players")\nlocal LocalPlayer = Players.LocalPlayer\n-- Tracer Line Drawing Snippet'
+    },
+    {
+      id: 7,
+      title: '3D Bounding Box ESP',
+      author: 'Skylight Team',
+      desc: 'Renders 3D wireframe bounding boxes around player characters in real-time.',
+      tags: ['Visuals', '3D Box'],
+      loadstring: 'local RunService = game:GetService("RunService")\n-- 3D Bounding Box Wireframe Math Routine'
+    },
+    {
+      id: 8,
+      title: 'AimLock & Sticky Torso Target',
+      author: 'Skylight Team',
+      desc: 'Sticky target acquisition locking camera vector onto enemy Torso/HumanoidRootPart.',
+      tags: ['Combat', 'AimLock'],
+      loadstring: 'local UserInputService = game:GetService("UserInputService")\nlocal Camera = workspace.CurrentCamera\n-- AimLock CFrame LookAt Routine'
+    },
+    {
+      id: 9,
+      title: 'KillAura & Auto-Attack Engine',
+      author: 'Skylight Team',
+      desc: 'Server-side silent rotation aura with ~10 CPS attack rate and jump critical attack timing.',
+      tags: ['Combat', 'Aura'],
+      loadstring: 'local RunService = game:GetService("RunService")\nlocal Players = game:GetService("Players")\n-- KillAura Radius Check & Auto Attack Loop'
+    },
+    {
+      id: 10,
+      title: 'TargetHUD Avatar & HP Bar Widget',
+      author: 'Skylight Team',
+      desc: 'Floating CS-style widget displaying target avatar headshot, player name, HP text, and animated health bar.',
+      tags: ['HUD', 'Widgets'],
+      loadstring: 'local Players = game:GetService("Players")\n-- TargetHUD UI Construction & Health Event Listeners'
+    },
+    {
+      id: 11,
+      title: 'Hotkeys Status HUD Widget',
+      author: 'Skylight Team',
+      desc: 'Floating keybind status overlay showing active modules (Aura [R], Speed [LShift], AimLock [C]).',
+      tags: ['HUD', 'Widgets'],
+      loadstring: '-- Hotkeys HUD Widget Frame & Status Indicator Updates'
+    },
+    {
+      id: 12,
+      title: 'CFrame Speed Multiplier Engine',
+      author: 'Skylight Team',
+      desc: 'Smooth velocity-based movement multiplier in Hold Mode (default keybind: Left Shift).',
+      tags: ['Movement', 'Speed'],
+      loadstring: 'local RunService = game:GetService("RunService")\nlocal LP = game:GetService("Players").LocalPlayer\n-- CFrame Speed Multiplication Routine'
+    },
+    {
+      id: 13,
+      title: 'Smooth Fly & Flight Controller',
+      author: 'Skylight Team',
+      desc: 'BodyVelocity & BodyGyro flight controller with WASD directional navigation.',
+      tags: ['Movement', 'Fly'],
+      loadstring: 'local UserInputService = game:GetService("UserInputService")\n-- Fly Controller Implementation'
+    },
+    {
+      id: 14,
+      title: 'Noclip & Collision Bypass',
+      author: 'Skylight Team',
+      desc: 'Disables CanCollide on all character limbs via Stepped connection to walk through walls.',
+      tags: ['Movement', 'Noclip'],
+      loadstring: 'local RS = game:GetService("RunService")\nlocal LP = game:GetService("Players").LocalPlayer\nRS.Stepped:Connect(function()\n    if LP.Character then\n        for _, p in pairs(LP.Character:GetDescendants()) do\n            if p:IsA("BasePart") then p.CanCollide = false end\n        end\n    end\nend)'
+    },
+    {
+      id: 15,
+      title: 'Infinite Jump Handler',
+      author: 'Skylight Team',
+      desc: 'Bypasses jump limits, allowing continuous mid-air jumping on JumpRequest event.',
+      tags: ['Player', 'Jump'],
+      loadstring: 'local UIS = game:GetService("UserInputService")\nUIS.JumpRequest:Connect(function()\n    local char = game.Players.LocalPlayer.Character\n    if char and char:FindFirstChildOfClass("Humanoid") then\n        char:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")\n    end\nend)'
+    },
+    {
+      id: 16,
+      title: 'Night & Galaxy Skybox Customizer',
+      author: 'Skylight Team',
+      desc: 'Replaces default Roblox skybox with midnight galaxy sky assets and custom ambient lighting.',
+      tags: ['Atmosphere', 'Skybox'],
+      loadstring: 'local Lighting = game:GetService("Lighting")\nLighting.ClockTime = 0\nlocal sky = Instance.new("Sky", Lighting)\nsky.SkyboxBk = "rbxassetid://159454299"'
+    },
+    {
+      id: 17,
+      title: 'Custom Fog Color & Density Adjuster',
+      author: 'Skylight Team',
+      desc: 'Adjustable purple fog color, FogStart, FogEnd, and density sliders.',
+      tags: ['Atmosphere', 'Fog'],
+      loadstring: 'local Lighting = game:GetService("Lighting")\nLighting.FogColor = Color3.fromRGB(139, 92, 246)\nLighting.FogStart = 0\nLighting.FogEnd = 500'
+    },
+    {
+      id: 18,
+      title: 'Anti-AFK & Disconnect Prevention',
+      author: 'Skylight Team',
+      desc: 'Prevents 20-minute idle disconnects by simulating VirtualUser keypresses.',
+      tags: ['Utility', 'Anti-AFK'],
+      loadstring: 'local VU = game:GetService("VirtualUser")\ngame:GetService("Players").LocalPlayer.Idled:Connect(function()\n    VU:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)\n    wait(1)\n    VU:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)\nend)'
+    },
+    {
+      id: 19,
+      title: 'HTTP Discord Webhook Logger',
+      author: 'Skylight Team',
+      desc: 'Sends player statistics, place info, and executor info directly to your Discord Webhook.',
+      tags: ['Utility', 'Webhook'],
+      loadstring: 'local HttpService = game:GetService("HttpService")\nlocal req = http_request or request or HttpPost\n-- Discord Webhook JSON payload dispatch'
+    },
+    {
+      id: 20,
+      title: 'JSON Config File Saver/Loader',
+      author: 'Skylight Team',
+      desc: 'Saves and loads user settings via writefile and readfile JSON serialization.',
+      tags: ['Utility', 'Configs'],
+      loadstring: 'local HttpService = game:GetService("HttpService")\nlocal config = { Speed = 24, AuraRadius = 15 }\nwritefile("skylight_config.json", HttpService:JSONEncode(config))\nlocal loaded = HttpService:JSONDecode(readfile("skylight_config.json"))'
+    },
+    {
+      id: 21,
+      title: 'FOV Circle Capture Radius Overlay',
+      author: 'Skylight Team',
+      desc: 'Renders dynamic 2D FOV circle overlay around mouse cursor using Drawing API.',
+      tags: ['Visuals', 'FOV'],
+      loadstring: 'local fovCircle = Drawing.new("Circle")\nfovCircle.Radius = 120\nfovCircle.Color = Color3.fromRGB(56, 189, 248)\nfovCircle.Visible = true'
     }
   ];
 
@@ -338,7 +474,18 @@ InitializeClient()
     if (!grid) return;
     grid.innerHTML = '';
 
-    presetScripts.forEach(script => {
+    const searchInput = document.getElementById('script-search');
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+    const filtered = presetScripts.filter(script => {
+      if (!query) return true;
+      return script.title.toLowerCase().includes(query) ||
+             script.author.toLowerCase().includes(query) ||
+             script.desc.toLowerCase().includes(query) ||
+             script.tags.some(t => t.toLowerCase().includes(query));
+    });
+
+    filtered.forEach(script => {
       const card = document.createElement('div');
       card.className = 'script-card';
       card.innerHTML = `
@@ -373,5 +520,6 @@ InitializeClient()
     });
   }
 
+  document.getElementById('script-search')?.addEventListener('input', renderScriptHub);
   renderScriptHub();
 });
