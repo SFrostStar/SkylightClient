@@ -5,6 +5,8 @@ const fs = require('fs');
 let mainWindow;
 
 function createWindow() {
+  const iconPath = path.join(__dirname, 'icon.png');
+
   mainWindow = new BrowserWindow({
     width: 1240,
     height: 820,
@@ -12,8 +14,8 @@ function createWindow() {
     minHeight: 620,
     frame: false,
     titleBarStyle: 'hidden',
-    backgroundColor: '#08090e',
-    icon: path.join(__dirname, 'icon.svg'),
+    backgroundColor: '#0c0d14',
+    icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -21,6 +23,11 @@ function createWindow() {
       sandbox: false
     }
   });
+
+  // Set macOS dock icon
+  if (process.platform === 'darwin' && app.dock) {
+    app.dock.setIcon(iconPath);
+  }
 
   mainWindow.loadFile('index.html');
 
