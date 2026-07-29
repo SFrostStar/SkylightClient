@@ -4,7 +4,7 @@ use tao::{
     event_loop::{ControlFlow, EventLoop},
     window::WindowBuilder,
 };
-use wry::WebViewBuilder;
+use wry::{http::Response, WebViewBuilder};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let event_loop = EventLoop::new();
@@ -26,7 +26,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_min_inner_size(tao::dpi::LogicalSize::new(800.0, 500.0))
         .build(&event_loop)?;
 
-    // Attach native MenuBar for macOS NSApplication
     #[cfg(target_os = "macos")]
     menu.init_for_nsapp();
 
@@ -34,14 +33,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let _webview = WebViewBuilder::new()
         .with_user_agent(user_agent)
-        .with_url("https://www.google.com")
+        .with_custom_protocol("sky".into(), move |_id, _request| {
+            let index_bytes = include_bytes!("../index.html");
+            Response::builder()
+                .header("Content-Type", "text/html; charset=utf-8")
+                .body(index_bytes.to_vec().into())
+                .unwrap()
+        })
+        .with_url("sky://app/index.html")
         .build(&window)?;
 
     event_loop.run(move |event, _, control_flow| {
         *control_flow = ControlFlow::Wait;
 
         match event {
-            Event::NewEvents(StartCause::Init) => println!("[Sky Rust] Native Browser started with full Cmd+A support."),
+            Event::NewEvents(StartCause::Init) => println!("[Sky Rust] Native Browser started with sky:// custom protocol UI."),
             Event::WindowEvent {
                 event: WindowEvent::CloseRequested,
                 ..
