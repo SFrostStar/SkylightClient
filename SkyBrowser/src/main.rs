@@ -31,102 +31,146 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
 
-    // Injected Top Navigation Toolbar (⚡ Sky, ⬅️ Back, ➡️ Forward, 🔄 Reload, 🏠 Home, 🔍 Omnibox)
+    // Injected Beautiful Original UI Toolbar (Vector SVG Icons, Glass Theme, Always Visible)
     let init_toolbar_script = r#"
         (function() {
-            function injectSkyToolbar() {
+            function injectBeautifulToolbar() {
                 if (window.self !== window.top) return;
-                if (document.getElementById('sky-native-bar')) return;
+                if (document.getElementById('sky-header-root')) return;
 
                 const style = document.createElement('style');
-                style.id = 'sky-bar-style';
+                style.id = 'sky-header-style';
                 style.innerHTML = `
-                    #sky-native-bar {
+                    #sky-header-root {
                         position: fixed !important;
                         top: 0 !important;
                         left: 0 !important;
                         width: 100vw !important;
-                        height: 38px !important;
-                        background: #0f111a !important;
-                        border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+                        height: 44px !important;
+                        background: #12141c !important;
+                        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
                         display: flex !important;
                         align-items: center !important;
-                        padding: 0 10px !important;
-                        gap: 8px !important;
+                        padding: 0 12px !important;
+                        gap: 10px !important;
                         z-index: 2147483647 !important;
-                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+                        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
                         color: #f1f5f9 !important;
-                        box-shadow: 0 2px 10px rgba(0,0,0,0.5) !important;
+                        box-shadow: 0 4px 16px rgba(0,0,0,0.5) !important;
                         user-select: none !important;
                     }
                     html {
-                        margin-top: 38px !important;
+                        margin-top: 44px !important;
                     }
-                    .sky-btn {
-                        background: rgba(255,255,255,0.06) !important;
-                        border: 1px solid rgba(255,255,255,0.12) !important;
+                    .sky-logo-badge {
+                        display: flex !important;
+                        align-items: center !important;
+                        gap: 6px !important;
+                        font-weight: 700 !important;
+                        font-size: 13px !important;
+                        padding-right: 6px !important;
+                    }
+                    .sky-logo-svg { color: #38bdf8 !important; }
+                    .sky-nav-btns {
+                        display: flex !important;
+                        align-items: center !important;
+                        gap: 4px !important;
+                    }
+                    .sky-tool-btn {
+                        background: transparent !important;
+                        border: none !important;
                         color: #94a3b8 !important;
-                        width: 26px !important;
-                        height: 26px !important;
+                        width: 30px !important;
+                        height: 30px !important;
                         border-radius: 6px !important;
                         display: flex !important;
                         align-items: center !important;
                         justify-content: center !important;
                         cursor: pointer !important;
-                        font-size: 12px !important;
                         transition: all 0.15s ease !important;
                     }
-                    .sky-btn:hover {
-                        background: #38bdf8 !important;
-                        color: #0c0d14 !important;
-                    }
-                    .sky-input {
-                        flex: 1 !important;
-                        background: #181b28 !important;
-                        border: 1px solid rgba(255,255,255,0.12) !important;
-                        border-radius: 6px !important;
+                    .sky-tool-btn:hover {
+                        background: #242838 !important;
                         color: #f1f5f9 !important;
+                        transform: translateY(-1px) !important;
+                    }
+                    .sky-omnibox-wrap {
+                        flex: 1 !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        background: #1a1d29 !important;
+                        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                        border-radius: 8px !important;
                         padding: 0 10px !important;
-                        height: 26px !important;
-                        font-size: 12px !important;
-                        outline: none !important;
+                        height: 32px !important;
+                        transition: all 0.2s ease !important;
                     }
-                    .sky-input:focus {
+                    .sky-omnibox-wrap:focus-within {
                         border-color: #38bdf8 !important;
-                        box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25) !important;
+                        box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2) !important;
+                        background: #242838 !important;
                     }
-                    .sky-logo {
-                        font-weight: 700 !important;
-                        font-size: 12px !important;
-                        color: #38bdf8 !important;
-                        margin-right: 4px !important;
+                    .sky-ssl-icon {
+                        color: #10b981 !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        margin-right: 8px !important;
+                    }
+                    .sky-address-input {
+                        flex: 1 !important;
+                        background: transparent !important;
+                        border: none !important;
+                        outline: none !important;
+                        color: #f1f5f9 !important;
+                        font-family: inherit !important;
+                        font-size: 13px !important;
                     }
                 `;
                 if (document.head) document.head.appendChild(style);
 
-                const bar = document.createElement('div');
-                bar.id = 'sky-native-bar';
-                bar.innerHTML = `
-                    <span class="sky-logo">⚡ Sky</span>
-                    <button class="sky-btn" id="sky-back" title="Back">⬅️</button>
-                    <button class="sky-btn" id="sky-forward" title="Forward">➡️</button>
-                    <button class="sky-btn" id="sky-reload" title="Reload">🔄</button>
-                    <button class="sky-btn" id="sky-home" title="Home">🏠</button>
-                    <input type="text" class="sky-input" id="sky-url-input" value="${window.location.href}">
+                const root = document.createElement('div');
+                root.id = 'sky-header-root';
+                root.innerHTML = `
+                    <div class="sky-logo-badge">
+                        <svg class="sky-logo-svg" viewBox="0 0 24 24" width="18" height="18">
+                            <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                        </svg>
+                        <span>Sky</span>
+                    </div>
+                    <div class="sky-nav-btns">
+                        <button class="sky-tool-btn" id="sky-btn-back" title="Back">
+                            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                        </button>
+                        <button class="sky-tool-btn" id="sky-btn-forward" title="Forward">
+                            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z"/></svg>
+                        </button>
+                        <button class="sky-tool-btn" id="sky-btn-reload" title="Reload">
+                            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                        </button>
+                        <button class="sky-tool-btn" id="sky-btn-home" title="Home">
+                            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        </button>
+                    </div>
+                    <div class="sky-omnibox-wrap">
+                        <div class="sky-ssl-icon" title="Connection is secure">
+                            <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                        </div>
+                        <input type="text" class="sky-address-input" id="sky-address-input" value="${window.location.href}">
+                    </div>
                 `;
                 
                 if (document.body) {
-                    document.body.prepend(bar);
+                    document.body.prepend(root);
                 } else {
-                    document.addEventListener('DOMContentLoaded', () => document.body.prepend(bar));
+                    document.addEventListener('DOMContentLoaded', () => document.body.prepend(root));
                 }
 
-                document.getElementById('sky-back').onclick = () => window.history.back();
-                document.getElementById('sky-forward').onclick = () => window.history.forward();
-                document.getElementById('sky-reload').onclick = () => window.location.reload();
-                document.getElementById('sky-home').onclick = () => window.location.href = 'https://www.google.com';
+                document.getElementById('sky-btn-back').onclick = () => window.history.back();
+                document.getElementById('sky-btn-forward').onclick = () => window.history.forward();
+                document.getElementById('sky-btn-reload').onclick = () => window.location.reload();
+                document.getElementById('sky-btn-home').onclick = () => window.location.href = 'https://www.google.com';
 
-                const input = document.getElementById('sky-url-input');
+                const input = document.getElementById('sky-address-input');
                 input.onkeydown = (e) => {
                     if (e.key === 'Enter') {
                         let val = input.value.trim();
@@ -142,9 +186,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
 
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', injectSkyToolbar);
+                document.addEventListener('DOMContentLoaded', injectBeautifulToolbar);
             } else {
-                injectSkyToolbar();
+                injectBeautifulToolbar();
             }
         })();
     "#;
@@ -159,7 +203,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         *control_flow = ControlFlow::Wait;
 
         match event {
-            Event::NewEvents(StartCause::Init) => println!("[Sky Rust] Native Browser active with injected toolbar."),
+            Event::NewEvents(StartCause::Init) => println!("[Sky Rust] Native Browser started with original SVG UI."),
             Event::WindowEvent {
                 event: WindowEvent::CloseRequested,
                 ..
