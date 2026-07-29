@@ -13,7 +13,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_min_inner_size(tao::dpi::LogicalSize::new(800.0, 500.0))
         .build(&event_loop)?;
 
+    // Modern Chrome User-Agent so Google renders in modern Material 3 interface
+    let user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
+
     let _webview = WebViewBuilder::new(&window)
+        .with_user_agent(user_agent)
         .with_url("https://www.google.com")
         .build()?;
 
@@ -21,7 +25,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         *control_flow = ControlFlow::Wait;
 
         match event {
-            Event::NewEvents(StartCause::Init) => println!("[Sky Rust] Native Browser core started successfully."),
+            Event::NewEvents(StartCause::Init) => println!("[Sky Rust] Native Browser started with modern Google UI."),
             Event::WindowEvent {
                 event: WindowEvent::CloseRequested,
                 ..
