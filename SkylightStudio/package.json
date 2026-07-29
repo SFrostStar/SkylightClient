@@ -1,7 +1,8 @@
 {
   "name": "skylight-studio",
-  "version": "1.0.0",
-  "description": "Modern CS-Style Lua IDE & Script Hub for Roblox Developers",
+  "productName": "Skylight Studio",
+  "version": "2.0.0",
+  "description": "Editor for testing if script have any problems or not",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -18,7 +19,7 @@
   "author": "SFrostStar",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^43.2.0"
+    "electron": "^31.0.0"
   },
   "dependencies": {
     "luaparse": "^0.3.1",

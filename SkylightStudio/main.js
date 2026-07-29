@@ -2,19 +2,23 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
+// Set Application Name for macOS Menu Bar & Taskbar
+app.name = 'Skylight Studio';
+if (app.setName) app.setName('Skylight Studio');
+
 let mainWindow;
 
 function createWindow() {
   const iconPath = path.join(__dirname, 'icon.png');
 
   mainWindow = new BrowserWindow({
-    width: 1240,
-    height: 820,
-    minWidth: 920,
-    minHeight: 620,
+    width: 1040,
+    height: 680,
+    minWidth: 840,
+    minHeight: 540,
     frame: false,
     titleBarStyle: 'hidden',
-    backgroundColor: '#0c0d14',
+    backgroundColor: '#0d0e15',
     icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -24,7 +28,7 @@ function createWindow() {
     }
   });
 
-  // Set macOS dock icon
+  // Set macOS Dock Icon
   if (process.platform === 'darwin' && app.dock) {
     app.dock.setIcon(iconPath);
   }
