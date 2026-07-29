@@ -1,4 +1,4 @@
-/* Clean, Compact Developer Tool Theme (Linear / Raycast Style) */
+/* Clean Developer Tool Theme with Smooth Micro-Animations */
 :root {
   --bg-app: #0d0e15;
   --bg-sidebar: #131520;
@@ -12,6 +12,9 @@
   --accent-rose: #f43f5e;
   --accent-amber: #f59e0b;
   --accent-emerald: #10b981;
+  
+  --glow-sky: rgba(56, 189, 248, 0.4);
+  --glow-blue: rgba(59, 130, 246, 0.4);
   
   --text-primary: #f1f5f9;
   --text-secondary: #94a3b8;
@@ -48,7 +51,7 @@ body {
   background: var(--bg-app);
 }
 
-/* Header Titlebar - Compact */
+/* Header Titlebar */
 .titlebar {
   display: flex;
   align-items: center;
@@ -62,7 +65,7 @@ body {
   z-index: 100;
 }
 
-.titlebar-left {
+.titlebar-left, .titlebar-right {
   display: flex;
   align-items: center;
 }
@@ -75,11 +78,6 @@ body {
   align-items: center;
 }
 
-.titlebar-right {
-  display: flex;
-  align-items: center;
-}
-
 .titlebar-logo {
   display: flex;
   align-items: center;
@@ -87,10 +85,17 @@ body {
   font-weight: 600;
   font-size: 13px;
   color: var(--text-primary);
+  transition: transform 0.2s ease;
 }
 
 .logo-icon-svg {
   color: var(--accent-sky);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+}
+
+.titlebar-logo:hover .logo-icon-svg {
+  transform: scale(1.2) rotate(15deg);
+  filter: drop-shadow(0 0 8px var(--glow-sky));
 }
 
 .version-tag {
@@ -120,9 +125,10 @@ body {
   height: 6px;
   border-radius: 50%;
   background-color: var(--accent-emerald);
+  box-shadow: 0 0 6px var(--accent-emerald);
 }
 
-/* Window Controls */
+/* Window Controls Buttons */
 .window-controls {
   display: flex;
   align-items: center;
@@ -141,17 +147,19 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .control-btn:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
+  transform: scale(1.08);
 }
 
 .control-btn.close-btn:hover {
   background: var(--accent-rose);
   color: white;
+  box-shadow: 0 0 10px rgba(244, 63, 94, 0.4);
 }
 
 /* Main Layout */
@@ -161,7 +169,7 @@ body {
   overflow: hidden;
 }
 
-/* Sidebar Navigation - Compact 64px */
+/* Sidebar Navigation & Micro-Animations */
 .sidebar {
   width: 64px;
   background: var(--bg-sidebar);
@@ -170,12 +178,13 @@ body {
   flex-direction: column;
   justify-content: space-between;
   padding: 10px 6px;
+  z-index: 10;
 }
 
 .nav-section {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .nav-item {
@@ -185,18 +194,45 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  padding: 8px 2px;
-  border-radius: 6px;
+  gap: 4px;
+  padding: 10px 2px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   font-size: 10px;
   font-family: var(--font-sans);
+  position: relative;
 }
 
+.nav-item svg {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease, filter 0.2s ease;
+}
+
+.nav-item span {
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+/* Interactive Hover Animations for Sidebar Icons */
 .nav-item:hover {
   background: var(--bg-panel);
   color: var(--text-primary);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.nav-item:hover svg {
+  transform: scale(1.22) translateY(-1px);
+  color: var(--accent-sky);
+  filter: drop-shadow(0 0 6px var(--glow-sky));
+}
+
+.nav-item:hover span {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.nav-item:active {
+  transform: scale(0.95);
 }
 
 .nav-item.active {
@@ -204,8 +240,15 @@ body {
   color: var(--accent-sky);
   border-color: var(--border-active);
   font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
+.nav-item.active svg {
+  color: var(--accent-sky);
+  filter: drop-shadow(0 0 6px var(--glow-sky));
+}
+
+/* RUN Execute Button Micro-Animation */
 .execute-btn {
   width: 100%;
   background: var(--accent-blue);
@@ -220,15 +263,29 @@ body {
   cursor: pointer;
   font-weight: 600;
   font-size: 10px;
-  transition: all 0.15s ease;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+}
+
+.execute-btn svg {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .execute-btn:hover {
   background: #2563eb;
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 6px 16px var(--glow-blue);
 }
 
-/* Workspace */
+.execute-btn:hover svg {
+  transform: scale(1.25) translateX(1px);
+}
+
+.execute-btn:active {
+  transform: scale(0.96);
+}
+
+/* Workspace & View Switching Animations */
 .workspace {
   flex: 1;
   display: flex;
@@ -242,10 +299,22 @@ body {
   flex-direction: column;
   height: 100%;
   width: 100%;
+  animation: fadeInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .view-panel.hidden {
   display: none;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* Editor Header & Tabs */
@@ -279,12 +348,13 @@ body {
   cursor: pointer;
   border: 1px solid var(--border-subtle);
   border-bottom: none;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
 }
 
 .tab-item:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
+  transform: translateY(-1px);
 }
 
 .tab-item.active {
@@ -300,11 +370,13 @@ body {
   border-radius: 50%;
   padding: 1px 3px;
   font-size: 9px;
+  transition: all 0.15s ease;
 }
 
 .tab-close:hover {
   opacity: 1;
   color: var(--accent-rose);
+  background: rgba(244, 63, 94, 0.2);
 }
 
 .editor-actions {
@@ -325,13 +397,22 @@ body {
   display: flex;
   align-items: center;
   gap: 5px;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   font-family: var(--font-sans);
+}
+
+.action-btn svg {
+  transition: transform 0.2s ease;
 }
 
 .action-btn:hover {
   background: var(--bg-hover);
   border-color: var(--border-active);
+  transform: translateY(-1px);
+}
+
+.action-btn:hover svg {
+  transform: scale(1.15);
 }
 
 .accent-btn {
@@ -342,6 +423,7 @@ body {
 
 .accent-btn:hover {
   background: #2563eb;
+  box-shadow: 0 3px 10px var(--glow-blue);
 }
 
 .editor-container {
@@ -350,7 +432,7 @@ body {
   height: calc(100% - 34px);
 }
 
-/* Script Hub */
+/* Script Hub Grid & Card Hover Effects */
 #view-scripthub {
   padding: 20px;
   overflow-y: auto;
@@ -380,12 +462,12 @@ body {
   font-family: var(--font-sans);
   font-size: 12px;
   outline: none;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
 }
 
 .search-bar input:focus {
   border-color: var(--accent-blue);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 
 .script-grid {
@@ -404,13 +486,13 @@ body {
   flex-direction: column;
   justify-content: space-between;
   gap: 12px;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .script-card:hover {
   border-color: var(--border-active);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 15px rgba(56, 189, 248, 0.1);
 }
 
 .card-title {
@@ -444,6 +526,12 @@ body {
   padding: 1px 6px;
   border-radius: 4px;
   border: 1px solid var(--border-subtle);
+  transition: border-color 0.2s ease;
+}
+
+.script-card:hover .tag {
+  border-color: rgba(56, 189, 248, 0.3);
+  color: var(--accent-sky);
 }
 
 .card-actions {
@@ -461,7 +549,7 @@ body {
   font-size: 11px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   text-align: center;
 }
 
@@ -469,9 +557,11 @@ body {
   background: var(--accent-blue);
   border-color: var(--accent-blue);
   color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px var(--glow-blue);
 }
 
-/* Settings & Credits View */
+/* Settings View Cards */
 .settings-container {
   padding: 20px;
   overflow-y: auto;
@@ -508,6 +598,13 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  transition: all 0.25s ease;
+}
+
+.settings-card:hover {
+  border-color: var(--border-active);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .card-header-icon {
@@ -572,6 +669,7 @@ body {
   padding: 1px 5px;
   border-radius: 3px;
   cursor: pointer;
+  transition: background 0.15s ease;
 }
 
 .chip-copy-btn:hover {
@@ -585,7 +683,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 160px;
-  transition: height 0.2s ease;
+  transition: height 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .console-drawer.collapsed {
@@ -635,11 +733,12 @@ body {
   display: flex;
   align-items: center;
   gap: 3px;
-  transition: color 0.15s ease;
+  transition: color 0.15s ease, transform 0.15s ease;
 }
 
 .icon-btn:hover {
   color: var(--text-primary);
+  transform: scale(1.05);
 }
 
 .console-body {
