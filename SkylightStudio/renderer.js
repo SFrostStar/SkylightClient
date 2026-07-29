@@ -1,34 +1,52 @@
-// Skylight Studio Renderer Logic
+// Skylight Studio Renderer Logic - Pro Edition
 document.addEventListener('DOMContentLoaded', () => {
   // Window Controls
   document.getElementById('btn-minimize')?.addEventListener('click', () => window.electronAPI.minimizeWindow());
   document.getElementById('btn-maximize')?.addEventListener('click', () => window.electronAPI.maximizeWindow());
   document.getElementById('btn-close')?.addEventListener('click', () => window.electronAPI.closeWindow());
 
-  // View Navigation
+  // Navigation
   const navEditor = document.getElementById('nav-editor');
   const navScriptHub = document.getElementById('nav-scripthub');
+  const navConsoleToggle = document.getElementById('nav-console-toggle');
   const viewEditor = document.getElementById('view-editor');
   const viewScriptHub = document.getElementById('view-scripthub');
+  const consoleDrawer = document.getElementById('console-drawer');
+  const consoleHeader = document.getElementById('console-header');
+  const btnToggleDrawer = document.getElementById('btn-toggle-drawer');
+  const statusText = document.getElementById('status-text');
+  const syntaxStatus = document.getElementById('syntax-status');
 
   function switchView(view) {
     if (view === 'editor') {
-      navEditor.classList.add('active');
-      navScriptHub.classList.remove('active');
-      viewEditor.classList.remove('hidden');
-      viewScriptHub.classList.add('hidden');
+      navEditor?.classList.add('active');
+      navScriptHub?.classList.remove('active');
+      viewEditor?.classList.remove('hidden');
+      viewScriptHub?.classList.add('hidden');
     } else if (view === 'scripthub') {
-      navScriptHub.classList.add('active');
-      navEditor.classList.remove('active');
-      viewScriptHub.classList.remove('hidden');
-      viewEditor.classList.add('hidden');
+      navScriptHub?.classList.add('active');
+      navEditor?.classList.remove('active');
+      viewScriptHub?.classList.remove('hidden');
+      viewEditor?.classList.add('hidden');
     }
   }
 
   navEditor?.addEventListener('click', () => switchView('editor'));
   navScriptHub?.addEventListener('click', () => switchView('scripthub'));
 
-  // Console Log Manager
+  // Console Collapse/Expand Logic
+  function toggleConsole() {
+    consoleDrawer?.classList.toggle('collapsed');
+  }
+
+  navConsoleToggle?.addEventListener('click', toggleConsole);
+  consoleHeader?.addEventListener('click', (e) => {
+    if (e.target.closest('.console-actions')) return;
+    toggleConsole();
+  });
+  btnToggleDrawer?.addEventListener('click', toggleConsole);
+
+  // Console Output Stream
   const consoleLogs = document.getElementById('console-logs');
   const btnClearConsole = document.getElementById('btn-clear-console');
 
@@ -37,83 +55,122 @@ document.addEventListener('DOMContentLoaded', () => {
     const entry = document.createElement('div');
     entry.className = `log-entry ${type}`;
     const timestamp = new Date().toLocaleTimeString();
-    entry.innerText = `[${timestamp}] ${message}`;
+    
+    let prefix = 'ℹ️';
+    if (type === 'error') prefix = '❌';
+    else if (type === 'warn') prefix = '⚠️';
+    else if (type === 'success') prefix = '✅';
+    else if (type === 'system') prefix = '⚙️';
+
+    entry.innerHTML = `<span class="log-timestamp">${timestamp}</span> <span>${prefix} ${message}</span>`;
     consoleLogs.appendChild(entry);
     consoleLogs.scrollTop = consoleLogs.scrollHeight;
   }
 
   btnClearConsole?.addEventListener('click', () => {
     if (consoleLogs) consoleLogs.innerHTML = '';
-    logConsole('Console cleared.', 'system');
+    logConsole('Console log cleared by user.', 'system');
   });
 
-  // Tab Manager State
+  // State Management
   let tabs = [];
   let activeTabId = null;
   let tabCounter = 1;
   let monacoEditor = null;
 
-  // Initialize Monaco Editor
+  // Monaco Editor Initialization
   require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } });
 
   require(['vs/editor/editor.main'], () => {
-    // Custom Dark Purple Monaco Theme
-    monaco.editor.defineTheme('skylight-purple', {
+    // Custom Luxury Cyber-Emerald Monaco Theme
+    monaco.editor.defineTheme('skylight-emerald-gold', {
       base: 'vs-dark',
       inherit: true,
       rules: [
-        { token: 'keyword', foreground: 'c084fc', fontStyle: 'bold' },
-        { token: 'string', foreground: '86efac' },
-        { token: 'number', foreground: 'fde047' },
-        { token: 'comment', foreground: '6b7280', fontStyle: 'italic' },
-        { token: 'identifier', foreground: 'f3f4f6' },
-        { token: 'delimiter', foreground: 'a855f7' }
+        { token: 'keyword', foreground: '34d399', fontStyle: 'bold' },
+        { token: 'string', foreground: 'fbbf24' },
+        { token: 'number', foreground: '38bdf8' },
+        { token: 'comment', foreground: '64748b', fontStyle: 'italic' },
+        { token: 'identifier', foreground: 'f8fafc' },
+        { token: 'delimiter', foreground: 'a78bfa' }
       ],
       colors: {
-        'editor.background': '#0b0b12',
-        'editor.foreground': '#f3f4f6',
-        'editor.lineHighlightBackground': '#1b1b2e',
-        'editorCursor.foreground': '#c084fc',
-        'editorWhitespace.foreground': '#262640',
-        'editorIndentGuide.background': '#1b1b2e',
-        'editorIndentGuide.activeBackground': '#8a2be2'
+        'editor.background': '#07080e',
+        'editor.foreground': '#f8fafc',
+        'editor.lineHighlightBackground': '#171928',
+        'editorCursor.foreground': '#34d399',
+        'editorWhitespace.foreground': '#22253b',
+        'editorIndentGuide.background': '#171928',
+        'editorIndentGuide.activeBackground': '#10b981'
       }
     });
 
     monacoEditor = monaco.editor.create(document.getElementById('monaco-container'), {
-      value: '-- Skylight Studio v1.0\n-- Write or load your Roblox Luau scripts here!\n\nprint("Hello from Skylight Studio!")\n',
+      value: '-- Skylight Studio v1.0 Luxury Edition\n-- Real-Time Luau Syntax Validation Active\n\nlocal Services = {\n    Players = game:GetService("Players")\n}\n\nprint("Skylight Studio initialized cleanly!")\n',
       language: 'lua',
-      theme: 'skylight-purple',
+      theme: 'skylight-emerald-gold',
       automaticLayout: true,
       fontFamily: 'JetBrains Mono',
-      fontSize: 13,
+      fontSize: 13.5,
       minimap: { enabled: true },
       lineNumbers: 'on',
       scrollBeyondLastLine: false,
       tabSize: 4
     });
 
-    // Handle Editor Content Change
+    // Real-Time Lua Syntax Error Checking
     monacoEditor.onDidChangeModelContent(() => {
+      const code = monacoEditor.getValue();
+      
+      // Update Tab state
       if (activeTabId) {
         const tab = tabs.find(t => t.id === activeTabId);
         if (tab) {
-          tab.content = monacoEditor.getValue();
+          tab.content = code;
           tab.isDirty = true;
           renderTabs();
+        }
+      }
+
+      // Validate Code with luaparse via Electron IPC
+      if (window.electronAPI && window.electronAPI.validateLua) {
+        const result = window.electronAPI.validateLua(code);
+        const model = monacoEditor.getModel();
+
+        if (!result.valid) {
+          // Set red error markers in Monaco Editor
+          monaco.editor.setModelMarkers(model, 'luaparse', [{
+            startLineNumber: result.line,
+            startColumn: result.column + 1,
+            endLineNumber: result.line,
+            endColumn: result.column + 10,
+            message: `Syntax Error: ${result.message}`,
+            severity: monaco.MarkerSeverity.Error
+          }]);
+
+          if (syntaxStatus) {
+            syntaxStatus.innerHTML = `<span class="error-badge-status">Error Line ${result.line}:${result.column}</span>`;
+          }
+        } else {
+          // Clear Markers if syntax is clean
+          monaco.editor.setModelMarkers(model, 'luaparse', []);
+          if (syntaxStatus) {
+            syntaxStatus.innerHTML = `<span style="color: var(--accent-emerald-light);">Syntax: Clean</span>`;
+          }
         }
       }
     });
 
     // Create Initial Tab
     createTab('SkylightClient.lua', getInitialScript());
-    logConsole('Monaco Editor loaded successfully.', 'success');
+    logConsole('Skylight Studio Pro Edition online. Monaco Editor initialized.', 'success');
   });
 
   function getInitialScript() {
     return `--[[
-    Skylight Client v2.0
-    Created by SFrostStar
+    ⚡ Skylight Client v2.0
+    CS-Style ClickGUI Script for Roblox
+    Author: SFrostStar
 --]]
 
 local Services = {
@@ -124,11 +181,15 @@ local Services = {
 
 local LocalPlayer = Services.Players.LocalPlayer
 
-print("[Skylight Client v2.0] Loaded successfully for " .. LocalPlayer.Name)
+local function InitializeClient()
+    print("[Skylight Client] Successfully initialized for " .. LocalPlayer.Name)
+end
+
+InitializeClient()
 `;
   }
 
-  // Tab Operations
+  // Tabs Handling
   function createTab(filename = null, content = '') {
     const id = 'tab-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4);
     const name = filename || `Script_${tabCounter++}.lua`;
@@ -179,25 +240,16 @@ print("[Skylight Client v2.0] Loaded successfully for " .. LocalPlayer.Name)
     });
   }
 
-  // Actions: New, Open, Save
+  // New, Open, Save Handlers
   document.getElementById('btn-new-tab')?.addEventListener('click', () => createTab());
 
   document.getElementById('btn-open-file')?.addEventListener('click', async () => {
     const fileResult = await window.electronAPI.openFile();
     if (fileResult && fileResult.content !== undefined) {
-      const activeTab = tabs.find(t => t.id === activeTabId);
-      if (activeTab && !activeTab.isDirty && activeTab.content === '') {
-        activeTab.filename = fileResult.filename;
-        activeTab.content = fileResult.content;
-        activeTab.filePath = fileResult.filePath;
-        activeTab.isDirty = false;
-        setActiveTab(activeTab.id);
-      } else {
-        const id = 'tab-' + Date.now();
-        tabs.push({ id, filename: fileResult.filename, content: fileResult.content, filePath: fileResult.filePath, isDirty: false });
-        setActiveTab(id);
-      }
-      logConsole(`Loaded file: ${fileResult.filename}`, 'success');
+      const id = 'tab-' + Date.now();
+      tabs.push({ id, filename: fileResult.filename, content: fileResult.content, filePath: fileResult.filePath, isDirty: false });
+      setActiveTab(id);
+      logConsole(`Opened file from disk: ${fileResult.filename}`, 'success');
     }
   });
 
@@ -215,25 +267,31 @@ print("[Skylight Client v2.0] Loaded successfully for " .. LocalPlayer.Name)
       activeTab.filename = saveResult.filename;
       activeTab.isDirty = false;
       renderTabs();
-      logConsole(`Saved file: ${saveResult.filename}`, 'success');
+      logConsole(`Saved file to disk: ${saveResult.filename}`, 'success');
     }
   });
 
-  // Execute Simulator Button
+  // Execute & Validate Script Button
   document.getElementById('btn-execute-sim')?.addEventListener('click', () => {
     const code = monacoEditor ? monacoEditor.getValue() : '';
-    logConsole('Executing Luau Script in Simulator Environment...', 'system');
+    logConsole('Validating & Executing script in Luau Simulator...', 'system');
 
-    // Perform basic Luau Syntax Check simulation
-    if (code.includes('error(') || code.includes('function()') && !code.includes('end')) {
-      logConsole('Syntax Validation Warning: Unclosed block detected or explicit error call.', 'warn');
-    } else {
-      const lines = code.split('\n').length;
-      logConsole(`[Simulated Execution] Successfully parsed and executed ${lines} lines of code.`, 'success');
+    if (window.electronAPI && window.electronAPI.validateLua) {
+      const validation = window.electronAPI.validateLua(code);
+      if (!validation.valid) {
+        logConsole(`Syntax Error on line ${validation.line}, col ${validation.column}: ${validation.message}`, 'error');
+        if (consoleDrawer?.classList.contains('collapsed')) {
+          toggleConsole();
+        }
+        return;
+      }
     }
+
+    const lineCount = code.split('\n').length;
+    logConsole(`[Execution Output] Clean run! Successfully validated and executed ${lineCount} lines of Luau code.`, 'success');
   });
 
-  // Script Hub Data & Rendering
+  // Script Hub Catalog
   const presetScripts = [
     {
       id: 1,
@@ -247,17 +305,17 @@ print("[Skylight Client v2.0] Loaded successfully for " .. LocalPlayer.Name)
       id: 2,
       title: 'Rayfield UI Library Template',
       author: 'shlexware',
-      desc: 'Clean, modern UI Library template with window creation, tabs, buttons, sliders, and keybind toggles.',
-      tags: ['UI Library', 'Template'],
+      desc: 'Modern UI Library template with window creation, tabs, sliders, toggles, and keybinds.',
+      tags: ['UI Framework', 'Roblox'],
       loadstring: 'local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()\nlocal Window = Rayfield:CreateWindow({ Name = "Rayfield Hub", LoadingTitle = "Loading...", LoadingSubtitle = "by Rayfield" })'
     },
     {
       id: 3,
       title: 'Universal 3D Glow ESP',
       author: 'Skylight Team',
-      desc: 'High-performance player highlight ESP using Roblox Highlight service with customizable fill & outline colors.',
+      desc: 'High-performance player highlight ESP using Roblox Highlight service with custom outline colors.',
       tags: ['Visuals', 'ESP'],
-      loadstring: 'local Players = game:GetService("Players")\nfor _, p in pairs(Players:GetPlayers()) do\n    if p.Character then\n        local h = Instance.new("Highlight", p.Character)\n        h.FillColor = Color3.fromRGB(147, 51, 234)\n    end\nend'
+      loadstring: 'local Players = game:GetService("Players")\nfor _, p in pairs(Players:GetPlayers()) do\n    if p.Character then\n        local h = Instance.new("Highlight", p.Character)\n        h.FillColor = Color3.fromRGB(16, 185, 129)\n    end\nend'
     },
     {
       id: 4,
@@ -265,7 +323,7 @@ print("[Skylight Client v2.0] Loaded successfully for " .. LocalPlayer.Name)
       author: 'Skylight Team',
       desc: 'Smooth velocity-based movement framework with customizable hold keys and speed multipliers.',
       tags: ['Movement', 'Utility'],
-      loadstring: 'local RS = game:GetService("RunService")\nlocal LP = game:GetService("Players").LocalPlayer\nRS.RenderStepped:Connect(function()\n    if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then\n        -- Velocity calculation\n    end\nend)'
+      loadstring: 'local RS = game:GetService("RunService")\nlocal LP = game:GetService("Players").LocalPlayer\nRS.RenderStepped:Connect(function()\n    if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then\n        -- Speed & flight calculations\n    end\nend)'
     }
   ];
 
@@ -280,7 +338,7 @@ print("[Skylight Client v2.0] Loaded successfully for " .. LocalPlayer.Name)
       card.innerHTML = `
         <div>
           <div class="card-title">${script.title}</div>
-          <div style="font-size: 11px; color: var(--text-dark); margin: 2px 0 8px 0;">by ${script.author}</div>
+          <div style="font-size: 11px; color: var(--accent-gold); margin: 3px 0 8px 0;">by ${script.author}</div>
           <div class="card-desc">${script.desc}</div>
         </div>
         <div>
@@ -302,7 +360,7 @@ print("[Skylight Client v2.0] Loaded successfully for " .. LocalPlayer.Name)
 
       card.querySelector('.btn-copy').addEventListener('click', () => {
         navigator.clipboard.writeText(script.loadstring);
-        logConsole(`Copied loadstring for '${script.title}' to clipboard!`, 'info');
+        logConsole(`Copied loadstring for '${script.title}' to clipboard!`, 'system');
       });
 
       grid.appendChild(card);

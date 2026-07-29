@@ -18,6 +18,9 @@
   "author": "SFrostStar",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^31.0.0"
+    "electron": "^43.2.0"
+  },
+  "dependencies": {
+    "luaparse": "^0.3.1"
   }
 }
