@@ -1,7 +1,7 @@
 {
   "name": "skylight-studio",
   "productName": "Skylight Studio",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "description": "Editor for testing if script have any problems or not",
   "main": "main.js",
   "scripts": {

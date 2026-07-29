@@ -1,9 +1,10 @@
-# ⚡ Skylight Client & Skylight Studio v2.0
+# ⚡ Skylight Client & Skylight Studio v1.0
 
 ![Lua](https://img.shields.io/badge/Language-Lua%2FLuau-blue.svg)
 ![Roblox](https://img.shields.io/badge/Platform-Roblox-00A2FF.svg)
 ![Electron](https://img.shields.io/badge/Studio-Electron-47848F.svg)
-![Version](https://img.shields.io/badge/Version-v2.0_Pro-purple.svg)
+![Version](https://img.shields.io/badge/Version-v1.0-blue.svg)
+![Status](https://img.shields.io/badge/Support-Active_Updates-brightgreen.svg)
 
 > **Editor for testing if script have any problems or not, featuring a high-performance CS-Style ClickGUI for Roblox and a desktop Luau Studio.**
 
@@ -28,16 +29,17 @@ loadstring(game:HttpGet('https://raw.githubusercontent.com/SFrostStar/SkylightCl
 
 ---
 
-## 💻 Skylight Studio (Desktop Luau Editor & Testbench)
+## 💻 Skylight Studio v1.0 (Desktop Luau Editor & Testbench)
 
 **Editor for testing if script have any problems or not.**
 
-### ✨ Studio Features
+### ✨ Features & Active Support
 - **Real-Time Luau Syntax Validation**: Live `luaparse` AST syntax checking. Underlines syntax errors with red markers in Monaco Editor and outputs exact error lines to the diagnostics console.
-- **Monaco Editor Engine**: VS-Code editor core with custom `Deep Obsidian & Electric Sapphire` theme, syntax highlighting, and minimap.
-- **20+ Preset Script Hub**: Built-in catalog of 20+ preset Roblox scripts (Rayfield, Orion, Fluent, ESP, KillAura, AimLock, Speed, Fly, Webhook loggers) with 1-click loading & loadstring copying.
+- **Monaco Editor Engine**: VS-Code editor core with custom dark theme, syntax highlighting, and minimap.
+- **21 Preset Script Hub**: Built-in catalog of 21 preset Roblox scripts (Rayfield, Orion, Fluent, ESP, KillAura, AimLock, Speed, Fly, Webhook loggers) with 1-click loading & loadstring copying.
 - **Multi-Tab Management**: Open, edit, create, and save multiple `.lua` files.
 - **Diagnostics Console**: Real-time log stream with timestamps, system warnings, syntax errors, and clear controls.
+- **Active Maintenance**: Long-term support and feature updates by developer SFrostStar.
 
 ### 🏃 Quick Start (Run Studio Locally)
 
@@ -49,7 +51,7 @@ npm start
 
 ---
 
-## ✨ Skylight Client v2.0 Features
+## ✨ Skylight Client v1.0 Features
 
 ### ⚔️ Combat
 - **Aura (KillAura)**: Silent server-side rotation with ~10 CPS attack rate and jump critical timing.

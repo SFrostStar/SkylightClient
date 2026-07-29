@@ -1,4 +1,4 @@
-// Skylight Studio Renderer Logic
+// Skylight Studio Renderer Logic - v1.0
 document.addEventListener('DOMContentLoaded', () => {
   // Window Controls
   document.getElementById('btn-minimize')?.addEventListener('click', () => window.electronAPI.minimizeWindow());
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     monacoEditor = monaco.editor.create(document.getElementById('monaco-container'), {
-      value: '-- Skylight Studio v2.0\n-- Write, edit, and validate Roblox Luau scripts\n\nlocal Services = {\n    Players = game:GetService("Players")\n}\n\nprint("Skylight Studio initialized cleanly.")\n',
+      value: '-- Skylight Studio v1.0\n-- Real-time Luau syntax validation and editor\n\nlocal Services = {\n    Players = game:GetService("Players")\n}\n\nprint("Skylight Studio initialized cleanly.")\n',
       language: 'lua',
       theme: 'skylight-dark',
       automaticLayout: true,
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function getInitialScript() {
     return `--[[
-    ⚡ Skylight Client v2.0
+    ⚡ Skylight Client v1.0
     CS-Style ClickGUI Script for Roblox
     Developer: SFrostStar | Discord: xsynapse
 --]]
@@ -186,7 +186,7 @@ local Services = {
 local LocalPlayer = Services.Players.LocalPlayer
 
 local function InitializeClient()
-    print("[Skylight Client v2.0] Loaded successfully for " .. LocalPlayer.Name)
+    print("[Skylight Client v1.0] Loaded successfully for " .. LocalPlayer.Name)
 end
 
 InitializeClient()
@@ -295,11 +295,11 @@ InitializeClient()
     logConsole(`[Execution Success] Validated and executed ${lineCount} lines of Luau code cleanly.`, 'success');
   });
 
-  // Complete, Functional 21 Script Presets (No Stub Comments!)
+  // Presets
   const presetScripts = [
     {
       id: 1,
-      title: 'Skylight Client v2.0',
+      title: 'Skylight Client v1.0',
       author: 'SFrostStar',
       desc: 'Full CS-Style ClickGUI with Combat (Aura, AimLock), Movement (Speed, VClip), Visuals (ESP, Ambiance), and HUD Widgets.',
       tags: ['Full Client', 'Combat', 'GUI'],
