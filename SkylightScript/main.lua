@@ -1,27 +1,3 @@
---[[
-    MineBat CS-Style ClickGUI Script for Roblox
-    Features:
-    - 5 Categories: Combat, Movement, Visuals, Player, Settings
-    - Combat:
-        * Aura (KillAura) [R]
-        * AimLock (Locked target on Torso, sticky target until death, C key default) [C]
-    - Movement:
-        * Speed (CFrame speed, hold mode) [LShift / LeftShift]
-        * VClip UP [Up] & VClip DOWN [Down]
-    - Visuals:
-        * Tracers [NONE]
-        * ESP (3D Glow Highlight) [NONE]
-        * 3D Box [NONE]
-        * AimLock FOV (FOV Circle overlay) [NONE]
-        * TargetESP (Sci-fi dual-ring spinning reticle & pulsing ring) [NONE]
-        * Purple Ambiance (Purple screen tint & neon ambient lighting) [NONE]
-        * Custom Purple Fog (Custom fog color & density slider) [NONE]
-        * Night / Galaxy Sky (Custom skybox & midnight atmosphere) [NONE]
-    - Player: Infinite Jump, Camera FOV
-    - Hotkeys HUD Widget: Floating on-screen widget displaying active keybinds
-    - TargetHUD Widget: Floating avatar, player name, HP text & smooth animated HP bar
---]]
-
 local Services = {
     Players = game:GetService("Players"),
     RunService = game:GetService("RunService"),
@@ -29,64 +5,50 @@ local Services = {
     CoreGui = game:GetService("CoreGui"),
     TweenService = game:GetService("TweenService"),
     Workspace = game:GetService("Workspace"),
-    Lighting = game:GetService("Lighting")
+    Lighting = game:GetService("Lighting"),
+    HttpService = game:GetService("HttpService")
 }
 
 local LocalPlayer = Services.Players.LocalPlayer
 local Camera = Services.Workspace.CurrentCamera
 
--- Global State & Settings
 local Settings = {
-    -- Combat
     Aura = false,
     AuraRange = 25,
     AuraTarget = nil,
     TeamCheck = false,
-    
     AimLock = false,
     AimLockActive = false,
     AimLockTarget = nil,
     AimLockRange = 200,
-    
-    -- Movement
     Speed = false,
     SpeedMultiplier = 2.5,
     VClipDistance = 10,
-    
-    -- Visuals (NO DEFAULT BINDS INITIALLY)
+    Velocity = false,
+    ClickTP = false,
     Tracers = false,
     TracerColor = Color3.fromRGB(108, 92, 231),
-    
     ESP = false,
     ESPFill = Color3.fromRGB(108, 92, 231),
     ESPOutline = Color3.fromRGB(255, 255, 255),
     ESPFillTrans = 0.5,
-    
     Box3D = false,
     BoxColor = Color3.fromRGB(0, 255, 170),
-    
     AimLockFOV = false,
     AimLockFOVRadius = 150,
-    
     TargetESP = false,
-    
     PurpleAmbiance = false,
     CustomFog = false,
     FogDensity = 250,
     PurpleSky = false,
-    
-    -- Player
     InfJump = false,
     FOV = 70,
-    
-    -- UI & Widgets
     ToggleKey = Enum.KeyCode.RightShift,
     ShowHotkeysHUD = true,
     ShowTargetHUD = true,
     AccentColor = Color3.fromRGB(108, 92, 231)
 }
 
--- Lighting Cache & State
 local DefaultLighting = {
     Ambient = Services.Lighting.Ambient,
     OutdoorAmbient = Services.Lighting.OutdoorAmbient,
@@ -99,7 +61,6 @@ local DefaultLighting = {
 local ColorCorrection = nil
 local CustomSkyObj = nil
 
--- Atmosphere Update Handlers
 local function UpdateAmbiance()
     if Settings.PurpleAmbiance then
         if not ColorCorrection then
@@ -156,10 +117,8 @@ local function UpdateSky()
     end
 end
 
--- Module Binds Registry
 local Binds = {}
 
--- Connections & Drawing cache
 local Connections = {}
 local Highlights = {}
 local TracerDrawings = {}
@@ -168,7 +127,6 @@ local FOVCircleDrawing = nil
 local TargetESPDrawings = {}
 local TargetESPCircle = nil
 
--- Helper to format input names
 local function GetInputName(input)
     if not input then return "NONE" end
     if typeof(input) == "EnumItem" then
@@ -188,7 +146,6 @@ local function GetInputName(input)
     return "NONE"
 end
 
--- Input Match Check
 local function CheckInputMatch(bindKey, input)
     if not bindKey or not input then return false end
     if bindKey == input.KeyCode then return true end
@@ -196,7 +153,6 @@ local function CheckInputMatch(bindKey, input)
     return false
 end
 
--- Utility Functions
 local function CleanupVisuals()
     for player, hl in pairs(Highlights) do
         if hl then pcall(function() hl:Destroy() end) end
@@ -259,7 +215,6 @@ local function GetTargetTorso(character)
     return character:FindFirstChild("UpperTorso") or character:FindFirstChild("Torso") or character:FindFirstChild("HumanoidRootPart")
 end
 
--- Create GUI Container
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "MineBatCSGUI_" .. math.random(10000, 99999)
 ScreenGui.ResetOnSpawn = false
@@ -274,9 +229,6 @@ pcall(function()
     end
 end)
 
---------------------------------------------------------------------------------
--- PERMANENT WATERMARK (Top-Left Screen Corner - Tight Auto-Sizing)
---------------------------------------------------------------------------------
 local Watermark = Instance.new("Frame")
 Watermark.Name = "SkylightWatermark"
 Watermark.AutomaticSize = Enum.AutomaticSize.X
@@ -306,7 +258,7 @@ local WText = Instance.new("TextLabel")
 WText.AutomaticSize = Enum.AutomaticSize.X
 WText.Size = UDim2.new(0, 0, 1, 0)
 WText.BackgroundTransparency = 1
-WText.Text = "<font color=\"#6C5CE7\"><b>Skylight Client</b></font>  |  By A1wertykss  |  Discord: xsynapse  |  v2.0"
+WText.Text = "<font color=\"#6C5CE7\"><b>Skylight Client</b></font>  |  By A1wertykss  |  Discord: xsynapse  |  v3.0"
 WText.RichText = true
 WText.TextColor3 = Color3.fromRGB(240, 240, 245)
 WText.Font = Enum.Font.GothamBold
@@ -314,9 +266,6 @@ WText.TextSize = 12
 WText.TextXAlignment = Enum.TextXAlignment.Center
 WText.Parent = Watermark
 
---------------------------------------------------------------------------------
--- HOTKEYS HUD OVERLAY WIDGET (CS-Style Floating Box)
---------------------------------------------------------------------------------
 local HotkeysHUD = Instance.new("Frame")
 HotkeysHUD.Name = "HotkeysHUD"
 HotkeysHUD.Size = UDim2.new(0, 200, 0, 40)
@@ -371,7 +320,6 @@ HUDLayout.SortOrder = Enum.SortOrder.LayoutOrder
 HUDLayout.Padding = UDim.new(0, 4)
 HUDLayout.Parent = HUDList
 
--- Dragging for Hotkeys HUD
 local HUDDragging, HUDDragInput, HUDDragStart, HUDStartPos
 HUDHeader.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -399,7 +347,6 @@ Services.UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Refresh Hotkeys HUD View
 local function UpdateHotkeysHUD()
     if not Settings.ShowHotkeysHUD then
         HotkeysHUD.Visible = false
@@ -415,7 +362,6 @@ local function UpdateHotkeysHUD()
     for id, bindData in pairs(Binds) do
         if bindData.Key and GetInputName(bindData.Key) ~= "NONE" then
             count = count + 1
-            
             local ItemFrame = Instance.new("Frame")
             ItemFrame.Size = UDim2.new(1, 0, 0, 22)
             ItemFrame.BackgroundTransparency = 1
@@ -446,7 +392,6 @@ local function UpdateHotkeysHUD()
             StatusLabel.Size = UDim2.new(0.2, 0, 1, 0)
             StatusLabel.Position = UDim2.new(0.8, 0, 0, 0)
             StatusLabel.BackgroundTransparency = 1
-            
             if bindData.Type == "Toggle" then
                 local active = bindData.GetState and bindData.GetState()
                 StatusLabel.Text = active and "ON" or "OFF"
@@ -459,7 +404,6 @@ local function UpdateHotkeysHUD()
                 StatusLabel.Text = "TRIG"
                 StatusLabel.TextColor3 = Color3.fromRGB(0, 200, 255)
             end
-            
             StatusLabel.Font = Enum.Font.GothamBold
             StatusLabel.TextSize = 11
             StatusLabel.TextXAlignment = Enum.TextXAlignment.Right
@@ -482,9 +426,6 @@ local function UpdateHotkeysHUD()
     HotkeysHUD.Size = UDim2.new(0, 200, 0, newHeight)
 end
 
---------------------------------------------------------------------------------
--- TARGET HUD WIDGET (Avatar, Player Name, Smooth HP Bar)
---------------------------------------------------------------------------------
 local TargetHUD = Instance.new("Frame")
 TargetHUD.Name = "TargetHUD"
 TargetHUD.Size = UDim2.new(0, 250, 0, 75)
@@ -504,7 +445,6 @@ TargetHUDStroke.Thickness = 1.2
 TargetHUDStroke.Transparency = 0.4
 TargetHUDStroke.Parent = TargetHUD
 
--- Avatar Headshot Image
 local TargetAvatar = Instance.new("ImageLabel")
 TargetAvatar.Name = "TargetAvatar"
 TargetAvatar.Size = UDim2.new(0, 52, 0, 52)
@@ -518,7 +458,6 @@ local AvatarCorner = Instance.new("UICorner")
 AvatarCorner.CornerRadius = UDim.new(0, 6)
 AvatarCorner.Parent = TargetAvatar
 
--- Player Name Label
 local TargetName = Instance.new("TextLabel")
 TargetName.Name = "TargetName"
 TargetName.Size = UDim2.new(1, -78, 0, 22)
@@ -531,7 +470,6 @@ TargetName.TextSize = 13
 TargetName.TextXAlignment = Enum.TextXAlignment.Left
 TargetName.Parent = TargetHUD
 
--- HP Text Label
 local TargetHPText = Instance.new("TextLabel")
 TargetHPText.Name = "TargetHPText"
 TargetHPText.Size = UDim2.new(1, -78, 0, 18)
@@ -544,7 +482,6 @@ TargetHPText.TextSize = 11
 TargetHPText.TextXAlignment = Enum.TextXAlignment.Left
 TargetHPText.Parent = TargetHUD
 
--- Health Bar Container
 local HPBarBack = Instance.new("Frame")
 HPBarBack.Name = "HPBarBack"
 HPBarBack.Size = UDim2.new(1, -78, 0, 8)
@@ -568,7 +505,6 @@ local HPFillCorner = Instance.new("UICorner")
 HPFillCorner.CornerRadius = UDim.new(1, 0)
 HPFillCorner.Parent = HPBarFill
 
--- Dragging TargetHUD
 local THDragging, THDragInput, THDragStart, THStartPos
 TargetHUD.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -596,7 +532,6 @@ Services.UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Smooth Health Bar Updater Engine
 local currentTargetUserId = nil
 local function UpdateTargetHUD(character)
     if not Settings.ShowTargetHUD then
@@ -632,7 +567,6 @@ local function UpdateTargetHUD(character)
     end
 
     TargetHUD.Visible = true
-    
     local pName = plr and plr.DisplayName or character.Name
     TargetName.Text = pName
 
@@ -663,9 +597,6 @@ local function UpdateTargetHUD(character)
     }):Play()
 end
 
---------------------------------------------------------------------------------
--- MAIN CLICKGUI WINDOW
---------------------------------------------------------------------------------
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 640, 0, 420)
@@ -685,7 +616,6 @@ MainUIStroke.Thickness = 1.5
 MainUIStroke.Transparency = 0.3
 MainUIStroke.Parent = MainFrame
 
--- Topbar
 local Topbar = Instance.new("Frame")
 Topbar.Name = "Topbar"
 Topbar.Size = UDim2.new(1, 0, 0, 40)
@@ -724,7 +654,6 @@ local StatusCorner = Instance.new("UICorner")
 StatusCorner.CornerRadius = UDim.new(0, 4)
 StatusCorner.Parent = StatusBadge
 
--- Dragging Main Frame Logic
 local Dragging, DragInput, DragStart, StartPos
 Topbar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -752,7 +681,6 @@ Services.UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Sidebar (Left 5 Categories)
 local Sidebar = Instance.new("Frame")
 Sidebar.Name = "Sidebar"
 Sidebar.Size = UDim2.new(0, 150, 1, -40)
@@ -772,7 +700,6 @@ SidebarPadding.PaddingLeft = UDim.new(0, 8)
 SidebarPadding.PaddingRight = UDim.new(0, 8)
 SidebarPadding.Parent = Sidebar
 
--- Content Container
 local ContentContainer = Instance.new("Frame")
 ContentContainer.Name = "ContentContainer"
 ContentContainer.Size = UDim2.new(1, -160, 1, -50)
@@ -780,7 +707,6 @@ ContentContainer.Position = UDim2.new(0, 155, 0, 45)
 ContentContainer.BackgroundTransparency = 1
 ContentContainer.Parent = MainFrame
 
--- Tab Management
 local Categories = {
     { Name = "Combat", Icon = "⚔️" },
     { Name = "Movement", Icon = "⚡" },
@@ -807,7 +733,6 @@ local function SelectTab(selectedName)
     end
 end
 
--- GUI Builders
 local function CreateTabPage(name)
     local Page = Instance.new("ScrollingFrame")
     Page.Name = name .. "Page"
@@ -831,11 +756,11 @@ local function CreateTabPage(name)
     return Page
 end
 
--- Create Toggle with Clean One-Time Keybind Rebinding
-local function CreateToggle(parent, id, title, defaultState, callback, defaultKey, isHoldType)
+local function CreateToggle(parent, id, title, defaultState, callback, defaultKey, isHoldType, desc)
     local Frame = Instance.new("Frame")
-    Frame.Size = UDim2.new(1, 0, 0, 36)
-    Frame.BackgroundColor3 = Color3.fromRGB(24, 27, 37)
+    local frameH = desc and 52 or 36
+    Frame.Size = UDim2.new(1, 0, 0, frameH)
+    Frame.BackgroundColor3 = Color3.fromRGB(22, 25, 36)
     Frame.BorderSizePixel = 0
     Frame.Parent = parent
 
@@ -843,18 +768,36 @@ local function CreateToggle(parent, id, title, defaultState, callback, defaultKe
     Corner.CornerRadius = UDim.new(0, 6)
     Corner.Parent = Frame
 
+    local Stroke = Instance.new("UIStroke")
+    Stroke.Color = defaultState and Settings.AccentColor or Color3.fromRGB(38, 42, 58)
+    Stroke.Thickness = 1
+    Stroke.Transparency = defaultState and 0.4 or 0.6
+    Stroke.Parent = Frame
+
     local Label = Instance.new("TextLabel")
-    Label.Size = UDim2.new(1, -145, 1, 0)
-    Label.Position = UDim2.new(0, 12, 0, 0)
+    Label.Size = desc and UDim2.new(1, -145, 0, 22) or UDim2.new(1, -145, 1, 0)
+    Label.Position = desc and UDim2.new(0, 12, 0, 5) or UDim2.new(0, 12, 0, 0)
     Label.BackgroundTransparency = 1
     Label.Text = title
-    Label.TextColor3 = Color3.fromRGB(220, 225, 240)
-    Label.Font = Enum.Font.GothamMedium
+    Label.TextColor3 = Color3.fromRGB(240, 245, 255)
+    Label.Font = Enum.Font.GothamBold
     Label.TextSize = 13
     Label.TextXAlignment = Enum.TextXAlignment.Left
     Label.Parent = Frame
 
-    -- Keybind Selector Button
+    if desc then
+        local DescLabel = Instance.new("TextLabel")
+        DescLabel.Size = UDim2.new(1, -145, 0, 18)
+        DescLabel.Position = UDim2.new(0, 12, 0, 27)
+        DescLabel.BackgroundTransparency = 1
+        DescLabel.Text = desc
+        DescLabel.TextColor3 = Color3.fromRGB(140, 145, 165)
+        DescLabel.Font = Enum.Font.GothamMedium
+        DescLabel.TextSize = 10
+        DescLabel.TextXAlignment = Enum.TextXAlignment.Left
+        DescLabel.Parent = Frame
+    end
+
     local KeyBtn = Instance.new("TextButton")
     KeyBtn.Size = UDim2.new(0, 70, 0, 22)
     KeyBtn.Position = UDim2.new(1, -130, 0.5, -11)
@@ -869,7 +812,6 @@ local function CreateToggle(parent, id, title, defaultState, callback, defaultKe
     KeyCorner.CornerRadius = UDim.new(0, 4)
     KeyCorner.Parent = KeyBtn
 
-    -- Switch Button
     local Switch = Instance.new("TextButton")
     Switch.Size = UDim2.new(0, 44, 0, 22)
     Switch.Position = UDim2.new(1, -52, 0.5, -11)
@@ -898,6 +840,8 @@ local function CreateToggle(parent, id, title, defaultState, callback, defaultKe
         state = newState
         Switch.BackgroundColor3 = state and Settings.AccentColor or Color3.fromRGB(40, 45, 60)
         Knob.Position = state and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8)
+        Stroke.Color = state and Settings.AccentColor or Color3.fromRGB(38, 42, 58)
+        Stroke.Transparency = state and 0.4 or 0.6
         callback(state)
         UpdateHotkeysHUD()
     end
@@ -906,7 +850,6 @@ local function CreateToggle(parent, id, title, defaultState, callback, defaultKe
         UpdateVisuals(not state)
     end)
 
-    -- Register Bind Object
     local bindObj = {
         Key = defaultKey,
         Type = isHoldType and "Hold" or "Toggle",
@@ -919,7 +862,6 @@ local function CreateToggle(parent, id, title, defaultState, callback, defaultKe
     }
     Binds[id] = bindObj
 
-    -- One-time Keybind Rebinding Listener
     local isListening = false
     KeyBtn.MouseButton1Click:Connect(function()
         if isListening then return end
@@ -954,7 +896,6 @@ local function CreateToggle(parent, id, title, defaultState, callback, defaultKe
     return Frame
 end
 
--- Create Action Button with Clean One-Time Keybind Rebinding
 local function CreateButton(parent, id, title, callback, defaultKey)
     local Frame = Instance.new("Frame")
     Frame.Size = UDim2.new(1, 0, 0, 36)
@@ -967,73 +908,72 @@ local function CreateButton(parent, id, title, callback, defaultKey)
     Corner.Parent = Frame
 
     local Btn = Instance.new("TextButton")
-    Btn.Size = UDim2.new(1, -90, 1, 0)
+    Btn.Size = defaultKey and UDim2.new(1, -90, 1, 0) or UDim2.new(1, 0, 1, 0)
     Btn.Position = UDim2.new(0, 0, 0, 0)
     Btn.BackgroundTransparency = 1
-    Btn.Text = "   " .. title
+    Btn.Text = defaultKey and ("   " .. title) or title
     Btn.TextColor3 = Color3.fromRGB(240, 240, 245)
     Btn.Font = Enum.Font.GothamBold
     Btn.TextSize = 13
-    Btn.TextXAlignment = Enum.TextXAlignment.Left
+    Btn.TextXAlignment = defaultKey and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center
     Btn.Parent = Frame
-
-    -- Keybind Selector Button
-    local KeyBtn = Instance.new("TextButton")
-    KeyBtn.Size = UDim2.new(0, 75, 0, 22)
-    KeyBtn.Position = UDim2.new(1, -83, 0.5, -11)
-    KeyBtn.BackgroundColor3 = Color3.fromRGB(34, 38, 52)
-    KeyBtn.Text = defaultKey and ("[" .. GetInputName(defaultKey) .. "]") or "[ NONE ]"
-    KeyBtn.TextColor3 = Color3.fromRGB(170, 175, 195)
-    KeyBtn.Font = Enum.Font.GothamBold
-    KeyBtn.TextSize = 11
-    KeyBtn.Parent = Frame
-
-    local KeyCorner = Instance.new("UICorner")
-    KeyCorner.CornerRadius = UDim.new(0, 4)
-    KeyCorner.Parent = KeyBtn
 
     Btn.MouseButton1Click:Connect(callback)
 
-    -- Register Action Bind
-    local bindObj = {
-        Key = defaultKey,
-        Type = "Action",
-        Name = title,
-        Action = callback
-    }
-    Binds[id] = bindObj
+    if defaultKey then
+        local KeyBtn = Instance.new("TextButton")
+        KeyBtn.Size = UDim2.new(0, 75, 0, 22)
+        KeyBtn.Position = UDim2.new(1, -83, 0.5, -11)
+        KeyBtn.BackgroundColor3 = Color3.fromRGB(34, 38, 52)
+        KeyBtn.Text = "[" .. GetInputName(defaultKey) .. "]"
+        KeyBtn.TextColor3 = Color3.fromRGB(170, 175, 195)
+        KeyBtn.Font = Enum.Font.GothamBold
+        KeyBtn.TextSize = 11
+        KeyBtn.Parent = Frame
 
-    -- One-time Keybind Rebinding Listener
-    local isListening = false
-    KeyBtn.MouseButton1Click:Connect(function()
-        if isListening then return end
-        isListening = true
-        KeyBtn.Text = "[ ... ]"
-        KeyBtn.TextColor3 = Settings.AccentColor
+        local KeyCorner = Instance.new("UICorner")
+        KeyCorner.CornerRadius = UDim.new(0, 4)
+        KeyCorner.Parent = KeyBtn
 
-        local bindConn
-        bindConn = Services.UserInputService.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.Keyboard then
-                if input.KeyCode == Enum.KeyCode.Escape or input.KeyCode == Enum.KeyCode.Backspace then
-                    bindObj.Key = nil
-                else
-                    bindObj.Key = input.KeyCode
+        local bindObj = {
+            Key = defaultKey,
+            Type = "Action",
+            Name = title,
+            Action = callback
+        }
+        Binds[id] = bindObj
+
+        local isListening = false
+        KeyBtn.MouseButton1Click:Connect(function()
+            if isListening then return end
+            isListening = true
+            KeyBtn.Text = "[ ... ]"
+            KeyBtn.TextColor3 = Settings.AccentColor
+
+            local bindConn
+            bindConn = Services.UserInputService.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.Keyboard then
+                    if input.KeyCode == Enum.KeyCode.Escape or input.KeyCode == Enum.KeyCode.Backspace then
+                        bindObj.Key = nil
+                    else
+                        bindObj.Key = input.KeyCode
+                    end
+                    isListening = false
+                    KeyBtn.Text = "[" .. GetInputName(bindObj.Key) .. "]"
+                    KeyBtn.TextColor3 = Color3.fromRGB(170, 175, 195)
+                    UpdateHotkeysHUD()
+                    bindConn:Disconnect()
+                elseif input.UserInputType == Enum.UserInputType.MouseButton2 or input.UserInputType == Enum.UserInputType.MouseButton3 then
+                    bindObj.Key = input.UserInputType
+                    isListening = false
+                    KeyBtn.Text = "[" .. GetInputName(bindObj.Key) .. "]"
+                    KeyBtn.TextColor3 = Color3.fromRGB(170, 175, 195)
+                    UpdateHotkeysHUD()
+                    bindConn:Disconnect()
                 end
-                isListening = false
-                KeyBtn.Text = "[" .. GetInputName(bindObj.Key) .. "]"
-                KeyBtn.TextColor3 = Color3.fromRGB(170, 175, 195)
-                UpdateHotkeysHUD()
-                bindConn:Disconnect()
-            elseif input.UserInputType == Enum.UserInputType.MouseButton2 or input.UserInputType == Enum.UserInputType.MouseButton3 then
-                bindObj.Key = input.UserInputType
-                isListening = false
-                KeyBtn.Text = "[" .. GetInputName(bindObj.Key) .. "]"
-                KeyBtn.TextColor3 = Color3.fromRGB(170, 175, 195)
-                UpdateHotkeysHUD()
-                bindConn:Disconnect()
-            end
+            end)
         end)
-    end)
+    end
 
     return Frame
 end
@@ -1123,7 +1063,59 @@ local function CreateSlider(parent, title, minVal, maxVal, defaultVal, callback)
     return Frame
 end
 
--- Generate Sidebar Category Tabs
+local function CreateTextBox(parent, title, placeholder, defaultVal, callback)
+    local Frame = Instance.new("Frame")
+    Frame.Size = UDim2.new(1, 0, 0, 40)
+    Frame.BackgroundColor3 = Color3.fromRGB(24, 27, 37)
+    Frame.BorderSizePixel = 0
+    Frame.Parent = parent
+
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 6)
+    Corner.Parent = Frame
+
+    local Label = Instance.new("TextLabel")
+    Label.Size = UDim2.new(0.45, 0, 1, 0)
+    Label.Position = UDim2.new(0, 12, 0, 0)
+    Label.BackgroundTransparency = 1
+    Label.Text = title
+    Label.TextColor3 = Color3.fromRGB(220, 225, 240)
+    Label.Font = Enum.Font.GothamMedium
+    Label.TextSize = 13
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.Parent = Frame
+
+    local BoxFrame = Instance.new("Frame")
+    BoxFrame.Size = UDim2.new(0.5, 0, 0, 24)
+    BoxFrame.Position = UDim2.new(0.47, 0, 0.5, -12)
+    BoxFrame.BackgroundColor3 = Color3.fromRGB(34, 38, 52)
+    BoxFrame.BorderSizePixel = 0
+    BoxFrame.Parent = Frame
+
+    local BoxCorner = Instance.new("UICorner")
+    BoxCorner.CornerRadius = UDim.new(0, 4)
+    BoxCorner.Parent = BoxFrame
+
+    local Box = Instance.new("TextBox")
+    Box.Size = UDim2.new(1, -10, 1, 0)
+    Box.Position = UDim2.new(0, 5, 0, 0)
+    Box.BackgroundTransparency = 1
+    Box.PlaceholderText = placeholder
+    Box.Text = defaultVal or placeholder
+    Box.TextColor3 = Color3.fromRGB(250, 250, 255)
+    Box.PlaceholderColor3 = Color3.fromRGB(120, 125, 140)
+    Box.Font = Enum.Font.GothamBold
+    Box.TextSize = 12
+    Box.ClearTextOnFocus = false
+    Box.Parent = BoxFrame
+
+    Box.FocusLost:Connect(function()
+        callback(Box.Text)
+    end)
+
+    return Frame, Box
+end
+
 for i, cat in ipairs(Categories) do
     local Btn = Instance.new("TextButton")
     Btn.Name = cat.Name .. "Tab"
@@ -1148,25 +1140,19 @@ for i, cat in ipairs(Categories) do
     end)
 end
 
--- Default tab
 SelectTab("Combat")
 
---------------------------------------------------------------------------------
--- CATEGORY 1: COMBAT
---------------------------------------------------------------------------------
 local CombatPage = TabPages["Combat"]
 
--- 1. Aura (KillAura)
-CreateToggle(CombatPage, "aura", "Aura", Settings.Aura, function(state)
+CreateToggle(CombatPage, "aura", "TriggerBot", Settings.Aura, function(state)
     Settings.Aura = state
     if not state then Settings.AuraTarget = nil end
 end, Enum.KeyCode.R)
 
-CreateSlider(CombatPage, "Aura Distance (Studs)", 5, 50, Settings.AuraRange, function(val)
+CreateSlider(CombatPage, "TriggerBot Distance (Studs)", 5, 50, Settings.AuraRange, function(val)
     Settings.AuraRange = val
 end)
 
--- 2. AimLock (Default: C, Hold mode, targets Torso)
 CreateToggle(CombatPage, "aimlock", "AimLock", Settings.AimLock, function(state)
     Settings.AimLock = state
     if not state then
@@ -1183,12 +1169,8 @@ CreateToggle(CombatPage, "teamcheck", "Team Check", Settings.TeamCheck, function
     Settings.TeamCheck = state
 end)
 
---------------------------------------------------------------------------------
--- CATEGORY 2: MOVEMENT
---------------------------------------------------------------------------------
 local MovementPage = TabPages["Movement"]
 
--- Speed (Default: LShift / LeftShift, Hold mode)
 CreateToggle(MovementPage, "speed", "Speed", Settings.Speed, function(state)
     Settings.Speed = state
 end, Enum.KeyCode.LeftShift, true)
@@ -1196,6 +1178,14 @@ end, Enum.KeyCode.LeftShift, true)
 CreateSlider(MovementPage, "Speed Multiplier", 1, 10, math.floor(Settings.SpeedMultiplier), function(val)
     Settings.SpeedMultiplier = val
 end)
+
+CreateToggle(MovementPage, "velocity", "Velocity (No Knockback)", Settings.Velocity, function(state)
+    Settings.Velocity = state
+end, nil)
+
+CreateToggle(MovementPage, "clicktp", "Click Teleport", Settings.ClickTP, function(state)
+    Settings.ClickTP = state
+end, nil, false, "💡 Зажмите Ctrl и нажмите ЛКМ для телепортации")
 
 CreateSlider(MovementPage, "VClip Distance", 2, 50, Settings.VClipDistance, function(val)
     Settings.VClipDistance = val
@@ -1206,23 +1196,17 @@ local function PerformVClip(offset)
         local char = LocalPlayer.Character
         local root = char.HumanoidRootPart
         local hum = char:FindFirstChildOfClass("Humanoid")
-        
-        -- Store move direction & horizontal velocity
         local moveDir = hum and hum.MoveDirection or Vector3.new()
         local currentVel = root.AssemblyLinearVelocity
         local horizVelX = currentVel.X
         local horizVelZ = currentVel.Z
 
-        -- Teleport character vertically
         root.CFrame = root.CFrame * CFrame.new(0, offset, 0)
-        
-        -- Reset Y velocity to 0 (prevents fast downward gravity acceleration when spamming VClip UP)
         root.AssemblyLinearVelocity = Vector3.new(horizVelX, 0, horizVelZ)
         pcall(function()
             root.Velocity = Vector3.new(horizVelX, 0, horizVelZ)
         end)
 
-        -- Maintain continuous movement in held direction without needing to re-press WASD keys
         if hum then
             hum:ChangeState(Enum.HumanoidStateType.Freefall)
             if moveDir.Magnitude > 0 then
@@ -1240,9 +1224,6 @@ CreateButton(MovementPage, "vclip_down", "🔽 VClip DOWN", function()
     PerformVClip(-Settings.VClipDistance)
 end, Enum.KeyCode.Down)
 
---------------------------------------------------------------------------------
--- CATEGORY 3: VISUALS (NO DEFAULT BINDS INITIALLY)
---------------------------------------------------------------------------------
 local VisualsPage = TabPages["Visuals"]
 
 CreateToggle(VisualsPage, "tracers", "Tracers", Settings.Tracers, function(state)
@@ -1291,7 +1272,6 @@ CreateToggle(VisualsPage, "target_esp", "TargetESP", Settings.TargetESP, functio
     end
 end, nil)
 
--- Atmosphere & Lighting Customizer
 CreateToggle(VisualsPage, "purple_ambiance", "Purple Ambiance (Screen Tint)", Settings.PurpleAmbiance, function(state)
     Settings.PurpleAmbiance = state
     UpdateAmbiance()
@@ -1312,9 +1292,6 @@ CreateToggle(VisualsPage, "purple_sky", "Night / Galaxy Sky", Settings.PurpleSky
     UpdateSky()
 end, nil)
 
---------------------------------------------------------------------------------
--- CATEGORY 4: PLAYER
---------------------------------------------------------------------------------
 local PlayerPage = TabPages["Player"]
 
 CreateToggle(PlayerPage, "infjump", "Infinite Jump", Settings.InfJump, function(state)
@@ -1334,9 +1311,6 @@ CreateButton(PlayerPage, "reset_stats", "Reset Speed & FOV", function()
     end
 end)
 
---------------------------------------------------------------------------------
--- CATEGORY 5: SETTINGS
---------------------------------------------------------------------------------
 local SettingsPage = TabPages["Settings"]
 
 CreateToggle(SettingsPage, "hotkeys_hud", "Hotkeys HUD Widget", Settings.ShowHotkeysHUD, function(state)
@@ -1384,23 +1358,6 @@ local MenuKeySelCorner = Instance.new("UICorner")
 MenuKeySelCorner.CornerRadius = UDim.new(0, 4)
 MenuKeySelCorner.Parent = MenuKeySelector
 
-local settingMenuBind = false
-MenuKeySelector.MouseButton1Click:Connect(function()
-    if settingMenuBind then return end
-    settingMenuBind = true
-    MenuKeySelector.Text = "[ ... ]"
-
-    local conn
-    conn = Services.UserInputService.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Keyboard then
-            settingMenuBind = false
-            Settings.ToggleKey = input.KeyCode
-            MenuKeySelector.Text = "[" .. GetInputName(input.KeyCode) .. "]"
-            conn:Disconnect()
-        end
-    end)
-end)
-
 CreateButton(SettingsPage, "unload_script", "❌ Unload Script", function()
     CleanupVisuals()
     for _, conn in pairs(Connections) do
@@ -1409,19 +1366,11 @@ CreateButton(SettingsPage, "unload_script", "❌ Unload Script", function()
     ScreenGui:Destroy()
 end)
 
--- Initial HUD Build
 UpdateHotkeysHUD()
 UpdateTargetHUD(nil)
 
---------------------------------------------------------------------------------
--- GLOBAL INPUT ENGINE & HOTKEY LISTENER (Keyboard & Mouse Buttons)
---------------------------------------------------------------------------------
-
 Connections.GlobalHotkeysBegan = Services.UserInputService.InputBegan:Connect(function(input, gpe)
-    -- Don't trigger hotkeys if user is typing in chat/textbox
     if Services.UserInputService:GetFocusedTextBox() then return end
-    
-    -- Main GUI Visibility Toggle
     if input.KeyCode == Settings.ToggleKey then
         if MainFrame then
             MainFrame.Visible = not MainFrame.Visible
@@ -1430,7 +1379,6 @@ Connections.GlobalHotkeysBegan = Services.UserInputService.InputBegan:Connect(fu
         return
     end
 
-    -- Registered Module Hotkeys
     for id, bindObj in pairs(Binds) do
         if CheckInputMatch(bindObj.Key, input) then
             if bindObj.Type == "Toggle" and bindObj.Toggle then
@@ -1460,9 +1408,30 @@ Connections.GlobalHotkeysEnded = Services.UserInputService.InputEnded:Connect(fu
     end
 end)
 
---------------------------------------------------------------------------------
--- AIMLOCK LOGIC (Sticky Target on Torso + Mouse Rotation Lock)
---------------------------------------------------------------------------------
+Connections.ClickTPInput = Services.UserInputService.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if not Settings.ClickTP then return end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        local uis = Services.UserInputService
+        if uis:IsKeyDown(Enum.KeyCode.LeftControl) or uis:IsKeyDown(Enum.KeyCode.RightControl) then
+            if IsAlive(LocalPlayer) then
+                local mousePos = uis:GetMouseLocation()
+                local unitRay = Camera:ViewportPointToRay(mousePos.X, mousePos.Y)
+                local params = RaycastParams.new()
+                params.FilterType = Enum.RaycastFilterType.Exclude
+                if LocalPlayer.Character then
+                    params.FilterDescendantsInstances = {LocalPlayer.Character}
+                end
+                local result = Services.Workspace:Raycast(unitRay.Origin, unitRay.Direction * 2000, params)
+                if result then
+                    local targetPos = result.Position + Vector3.new(0, 3.5, 0)
+                    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(targetPos)
+                end
+            end
+        end
+    end
+end)
+
 local function GetClosestTargetToCursor()
     if not IsAlive(LocalPlayer) then return nil end
     local mousePos = Services.UserInputService:GetMouseLocation()
@@ -1495,12 +1464,10 @@ Connections.AimLockLoop = Services.RunService.RenderStepped:Connect(function()
         return
     end
 
-    -- Acquire or maintain sticky target until death or release
     if not Settings.AimLockTarget or not IsAlive(Services.Players:GetPlayerFromCharacter(Settings.AimLockTarget)) then
         Settings.AimLockTarget = GetClosestTargetToCursor()
     end
 
-    -- Lock camera on target's Torso
     if Settings.AimLockTarget then
         local torso = GetTargetTorso(Settings.AimLockTarget)
         if torso then
@@ -1509,30 +1476,28 @@ Connections.AimLockLoop = Services.RunService.RenderStepped:Connect(function()
     end
 end)
 
---------------------------------------------------------------------------------
--- MODULE LOGIC & RENDER LOOPS
---------------------------------------------------------------------------------
+local VirtualUser = game:GetService("VirtualUser")
+local VirtualInputManager = (pcall(function() return game:GetService("VirtualInputManager") end) and game:GetService("VirtualInputManager")) or nil
+local hasHitThisJump = true
+local wasOnGround = true
+local leftGroundTime = 0
 
-local lastJumpTime = 0
-local isJumping = false
 Connections.InfJumpConn = Services.UserInputService.JumpRequest:Connect(function()
-    lastJumpTime = tick()
-    isJumping = true
     if Settings.InfJump and IsAlive(LocalPlayer) then
         LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
     end
 end)
-
-local VirtualUser = game:GetService("VirtualUser")
-local lastSwing = 0
 
 Connections.AuraLoop = Services.RunService.Heartbeat:Connect(function()
     if not Settings.Aura or not IsAlive(LocalPlayer) then
         Settings.AuraTarget = nil
         return
     end
-    
-    local myRoot = LocalPlayer.Character.HumanoidRootPart
+    local char = LocalPlayer.Character
+    local myRoot = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not myRoot or not hum then return end
+
     local closestTarget = nil
     local closestDist = Settings.AuraRange
 
@@ -1551,53 +1516,54 @@ Connections.AuraLoop = Services.RunService.Heartbeat:Connect(function()
     Settings.AuraTarget = closestTarget
 
     if closestTarget then
-        local torso = GetTargetTorso(closestTarget)
-        if torso then
-            -- Silent Server-Side Rotation (Updates Character CFrame facing target without altering client Camera)
-            local targetPos = Vector3.new(torso.Position.X, myRoot.Position.Y, torso.Position.Z)
-            myRoot.CFrame = CFrame.new(myRoot.Position, targetPos)
-        end
-
-        -- Check 0.2s Jump Delay if jumping, or attack continuously
-        local now = tick()
-        if isJumping and (now - lastJumpTime < 0.2) then
+        local state = hum:GetState()
+        local isOnGround = (hum.FloorMaterial ~= Enum.Material.Air and state ~= Enum.HumanoidStateType.Jumping and state ~= Enum.HumanoidStateType.Freefall)
+        if isOnGround then
+            wasOnGround = true
             return
         end
-        isJumping = false
 
-        -- Rate limit swing for smooth hitting (~10 CPS)
-        if now - lastSwing >= 0.08 then
-            lastSwing = now
-            
-            -- Method 1: Tool Activate
-            local tool = LocalPlayer.Character:FindFirstChildOfClass("Tool")
-            if tool then
-                tool:Activate()
-                if tool:FindFirstChild("RemoteEvent") then
-                    pcall(function() tool.RemoteEvent:FireServer() end)
-                end
-            end
-            
-            -- Method 2: Virtual Click Simulation
+        if wasOnGround then
+            wasOnGround = false
+            hasHitThisJump = false
+            leftGroundTime = tick()
+        end
+
+        if hasHitThisJump then
+            return
+        end
+
+        if tick() - leftGroundTime < 0.1 then
+            return
+        end
+
+        hasHitThisJump = true
+        if VirtualInputManager then
             pcall(function()
-                VirtualUser:Button1Down(Vector2.new(0,0), Camera.CFrame)
-                task.wait(0.01)
-                VirtualUser:Button1Up(Vector2.new(0,0), Camera.CFrame)
+                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
             end)
+        else
+            local tool = char:FindFirstChildOfClass("Tool")
+            if tool then
+                pcall(function() tool:Activate() end)
+            else
+                pcall(function()
+                    VirtualUser:CaptureController()
+                    VirtualUser:ClickButton1(Vector2.new(0, 0))
+                end)
+            end
         end
     end
 end)
 
--- 2. TargetHUD Update Loop
 Connections.TargetHUDLoop = Services.RunService.RenderStepped:Connect(function()
     local currentTarget = Settings.AimLockTarget or Settings.AuraTarget
     UpdateTargetHUD(currentTarget)
 end)
 
--- 3. Speed Engine
 Connections.SpeedLoop = Services.RunService.RenderStepped:Connect(function(delta)
     if not Settings.Speed or not IsAlive(LocalPlayer) then return end
-    
     local hum = LocalPlayer.Character.Humanoid
     local root = LocalPlayer.Character.HumanoidRootPart
     if hum.MoveDirection.Magnitude > 0 then
@@ -1605,7 +1571,53 @@ Connections.SpeedLoop = Services.RunService.RenderStepped:Connect(function(delta
     end
 end)
 
--- 5. Visuals Loop (Tracers, ESP, 3D Box, AimLock FOV Circle, TargetESP Sci-Fi Reticle)
+local KnockbackClasses = {"BodyVelocity", "LinearVelocity", "VectorForce", "BodyPosition", "BodyThrust", "BodyAngularVelocity", "LineForce"}
+
+local function HandleVelocity()
+    if not Settings.Velocity or not IsAlive(LocalPlayer) then return end
+    local char = LocalPlayer.Character
+    if not char then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if root then
+        for _, child in ipairs(root:GetChildren()) do
+            for _, className in ipairs(KnockbackClasses) do
+                if child:IsA(className) then
+                    pcall(function() child:Destroy() end)
+                end
+            end
+        end
+        for _, child in ipairs(char:GetChildren()) do
+            for _, className in ipairs(KnockbackClasses) do
+                if child:IsA(className) then
+                    pcall(function() child:Destroy() end)
+                end
+            end
+        end
+
+        local currentVel = root.AssemblyLinearVelocity
+        local targetVelX, targetVelZ = 0, 0
+
+        if hum and hum.MoveDirection.Magnitude > 0 then
+            local speed = (Settings.Speed and (16 * Settings.SpeedMultiplier)) or hum.WalkSpeed
+            local moveVel = hum.MoveDirection * speed
+            targetVelX = moveVel.X
+            targetVelZ = moveVel.Z
+        end
+
+        root.AssemblyLinearVelocity = Vector3.new(targetVelX, currentVel.Y, targetVelZ)
+        root.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+        pcall(function()
+            root.Velocity = Vector3.new(targetVelX, root.Velocity.Y, targetVelZ)
+            root.RotVelocity = Vector3.new(0, 0, 0)
+        end)
+    end
+end
+
+Connections.VelocityHeartbeat = Services.RunService.Heartbeat:Connect(HandleVelocity)
+Connections.VelocityRender = Services.RunService.RenderStepped:Connect(HandleVelocity)
+Connections.VelocityStepped = Services.RunService.Stepped:Connect(HandleVelocity)
+
 local function GetBoxVertices(cf, size)
     local sx, sy, sz = size.X / 2, size.Y / 2, size.Z / 2
     return {
@@ -1621,15 +1633,12 @@ local function GetBoxVertices(cf, size)
 end
 
 local BoxEdges = {
-    {1,2},{2,3},{3,4},{4,1}, -- Back face
-    {5,6},{6,7},{7,8},{8,5}, -- Front face
-    {1,5},{2,6},{3,7},{4,8}  -- Connecting edges
+    {1,2},{2,3},{3,4},{4,1},
+    {5,6},{6,7},{7,8},{8,5},
+    {1,5},{2,6},{3,7},{4,8}
 }
 
 Connections.VisualsLoop = Services.RunService.RenderStepped:Connect(function()
-    ----------------------------------------------------------------------------
-    -- A. AIMLOCK FOV CIRCLE
-    ----------------------------------------------------------------------------
     if Drawing then
         if not FOVCircleDrawing then
             FOVCircleDrawing = Drawing.new("Circle")
@@ -1650,9 +1659,6 @@ Connections.VisualsLoop = Services.RunService.RenderStepped:Connect(function()
         end
     end
 
-    ----------------------------------------------------------------------------
-    -- B. BEAUTIFUL TARGET ESP (Dual-Ring Sci-Fi Reticle & Pulsing Ring)
-    ----------------------------------------------------------------------------
     local currentTarget = Settings.AimLockTarget or Settings.AuraTarget
     if Settings.TargetESP and currentTarget and IsAlive(Services.Players:GetPlayerFromCharacter(currentTarget)) and Drawing then
         local torso = GetTargetTorso(currentTarget)
@@ -1676,8 +1682,6 @@ Connections.VisualsLoop = Services.RunService.RenderStepped:Connect(function()
                 end
 
                 local center = Vector2.new(screenPos.X, screenPos.Y)
-                
-                -- 1. Inner Rotating Diamond (Lines 1-4)
                 local a1 = tick() * 3.5
                 local r1 = 20
                 local verts1 = {}
@@ -1694,7 +1698,6 @@ Connections.VisualsLoop = Services.RunService.RenderStepped:Connect(function()
                     l.Visible = true
                 end
 
-                -- 2. Outer Counter-Rotating Sci-Fi Corner Brackets (Lines 5-12)
                 local a2 = -tick() * 2.2
                 local r2 = 34
                 local arm = 12
@@ -1720,7 +1723,6 @@ Connections.VisualsLoop = Services.RunService.RenderStepped:Connect(function()
                     lineIdx = lineIdx + 1
                 end
 
-                -- 3. Center Pulsing Target Ring
                 TargetESPCircle.Position = center
                 TargetESPCircle.Radius = 14 + math.sin(tick() * 6) * 3
                 TargetESPCircle.Color = Color3.fromRGB(0, 255, 200)
@@ -1738,14 +1740,9 @@ Connections.VisualsLoop = Services.RunService.RenderStepped:Connect(function()
         if TargetESPCircle then TargetESPCircle.Visible = false end
     end
 
-    ----------------------------------------------------------------------------
-    -- C. PLAYER ESP / TRACERS / 3D BOX
-    ----------------------------------------------------------------------------
     for _, plr in ipairs(Services.Players:GetPlayers()) do
         if plr ~= LocalPlayer then
             local alive = IsAlive(plr)
-            
-            -- Highlight ESP
             if Settings.ESP and alive then
                 local hl = Highlights[plr]
                 if not hl or hl.Parent ~= plr.Character then
@@ -1766,7 +1763,6 @@ Connections.VisualsLoop = Services.RunService.RenderStepped:Connect(function()
                 end
             end
 
-            -- Tracers
             if Settings.Tracers and alive and Drawing then
                 local line = TracerDrawings[plr]
                 if not line then
@@ -1793,7 +1789,6 @@ Connections.VisualsLoop = Services.RunService.RenderStepped:Connect(function()
                 end
             end
 
-            -- 3D Box
             if Settings.Box3D and alive and Drawing then
                 local lines = BoxDrawings[plr]
                 if not lines then
@@ -1841,7 +1836,6 @@ Connections.VisualsLoop = Services.RunService.RenderStepped:Connect(function()
     end
 end)
 
--- Player Leaving Cleanup
 Services.Players.PlayerRemoving:Connect(function(plr)
     if Highlights[plr] then
         pcall(function() Highlights[plr]:Destroy() end)
