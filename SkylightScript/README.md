@@ -1,4 +1,4 @@
-# ⚡ Skylight Client v2.0
+# ⚡ Skylight Client v3.0
 
 ![Lua](https://img.shields.io/badge/Language-Lua-blue.svg)
 ![Roblox](https://img.shields.io/badge/Platform-Roblox-00A2FF.svg)
